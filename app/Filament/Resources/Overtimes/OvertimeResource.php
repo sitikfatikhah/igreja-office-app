@@ -25,7 +25,7 @@ class OvertimeResource extends Resource
 
     protected static ?string $cluster = AttendancesCluster::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::HandRaised;
 
     public static function form(Schema $schema): Schema
     {

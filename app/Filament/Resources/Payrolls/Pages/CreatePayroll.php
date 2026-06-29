@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Payrolls\Pages;
 
 use App\Filament\Clusters\Payrolls\PayrollsCluster;
 use App\Filament\Resources\Payrolls\PayrollResource;
+use App\Models\AttendanceReport;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePayroll extends CreateRecord
@@ -12,14 +13,12 @@ class CreatePayroll extends CreateRecord
 
     protected static ?string $cluster = PayrollsCluster::class;
 
-    protected function getMutatedFormData(array $data): array
+    protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['user_id'] = auth()->id(); // Set user_id otomatis berdasarkan user yang sedang login
-        $data['generated_at'] = now(); // Set generated_at otomatis ke waktu saat ini
-        $data['status'] = 'pending'; // Set status default ke 'pending'
+        $data['generated_at'] = now();
+
+        $data['status'] = 'generated';
 
         return $data;
     }
-
-    
 }

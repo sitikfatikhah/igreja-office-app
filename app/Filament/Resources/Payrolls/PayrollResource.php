@@ -23,7 +23,7 @@ class PayrollResource extends Resource
 
     protected static ?string $cluster = PayrollsCluster::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::DocumentCurrencyDollar;
 
     public static function form(Schema $schema): Schema
     {

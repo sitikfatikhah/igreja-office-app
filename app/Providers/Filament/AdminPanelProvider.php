@@ -2,11 +2,25 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\AttendanceReportStatusWidget;
+use App\Filament\Widgets\AttendanceStats;
+use App\Filament\Widgets\AttendanceTodayWidget;
+use App\Filament\Widgets\AttendanceTrendChart;
+use App\Filament\Widgets\LeaveRequestChart;
+use App\Filament\Widgets\LeaveStats;
+use App\Filament\Widgets\OvertimesStats;
+use App\Filament\Pages\Dashboard;
+use App\Filament\Widgets\OverviewStats;
+use App\Filament\Widgets\PayrollStats;
+use App\Filament\Widgets\PayrollStatusWidget;
+use App\Filament\Widgets\PendingApprovalWidget;
+use App\Filament\Widgets\RecentActivitiesWidget;
 use Filament\Http\Middleware\Authenticate;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
+
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -31,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
@@ -39,9 +54,35 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                
                 AccountWidget::class,
-                FilamentInfoWidget::class,
+                // FilamentInfoWidget::class,
+
+                // Executive
+                // OverviewStats::class,
+
+                // Action Center
+                // PendingApprovalWidget::class,
+
+                // Core HR
+                // AttendanceStats::class,
+                LeaveStats::class,
+                OvertimesStats::class,
+                // PayrollStats::class,
+
+                // Monitoring
+                AttendanceTrendChart::class,
+                LeaveRequestChart::class,
+
+                // Admin Monitoring
+                // AttendanceTodayWidget::class,
+                PayrollStatusWidget::class,
+                // AttendanceReportStatusWidget::class,
+
+                // Activity
+                // RecentActivitiesWidget::class,
             ])
+            ->pages([Dashboard::class,])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -52,6 +93,9 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+            ])
+            ->plugins([
+                FilamentShieldPlugin::make(),
             ])
             ->authMiddleware([
                 Authenticate::class,

@@ -6,6 +6,7 @@ use App\Filament\Clusters\Payrolls\PayrollsCluster;
 use App\Filament\Resources\AttendanceReports\Pages\CreateAttendanceReport;
 use App\Filament\Resources\AttendanceReports\Pages\EditAttendanceReport;
 use App\Filament\Resources\AttendanceReports\Pages\ListAttendanceReports;
+use App\Filament\Resources\AttendanceReports\Pages\ViewAttendanceReport;
 use App\Filament\Resources\AttendanceReports\Schemas\AttendanceReportForm;
 use App\Filament\Resources\AttendanceReports\Tables\AttendanceReportsTable;
 use App\Models\AttendanceReport;
@@ -23,7 +24,7 @@ class AttendanceReportResource extends Resource
 
     protected static ?string $cluster = PayrollsCluster::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::PaperClip;
 
     public static function form(Schema $schema): Schema
     {
@@ -48,6 +49,7 @@ class AttendanceReportResource extends Resource
             'index' => ListAttendanceReports::route('/'),
             'create' => CreateAttendanceReport::route('/create'),
             'edit' => EditAttendanceReport::route('/{record}/edit'),
+            'view' => ViewAttendanceReport::route('/{record}/view')
         ];
     }
 

@@ -19,8 +19,8 @@ class CreateAttendanceReport extends CreateRecord
             ->select([
                 'user_id',
                 DB::raw('DATE(date) as date'),
-                DB::raw('TIME(check_in) as start_time'),
-                DB::raw('TIME(check_out) as end_time'),
+                DB::raw('DATE(start_date) as start date'),
+                DB::raw('DATE(end_date) as end date'),
             ]);
             
             if(!empty($data['user-id'])){

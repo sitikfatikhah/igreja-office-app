@@ -12,18 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payrolls', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->date('pay_period');
-            $table->decimal('gross_pay', 10, 2);
-            $table->decimal('deductions', 10, 2);
-            $table->decimal('additions', 10, 2);
-            $table->decimal('net_pay', 10, 2);
-            $table->timestamp('generated_at')->nullable();
-            $table->string('status')->default('pending');
-            $table->softDeletes();
-            $table->timestamps();
-        });
+        $table->id();
+        $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+        $table->foreignId('attendance_report_id')->constrained()->cascadeOnDelete();
+        $table->date('start_date');
+        $table->date('end_date');
+        $table->decimal('gross_pay', 15, 2)->default(0);
+        $table->decimal('net_pay', 15, 2)->default(0);
+        $table->decimal('deductions', 15, 2)->nullable();
+        $table->decimal('additions', 15, 2)->nullable();
+        $table->dateTime('generated_at');
+        $table->string('status')->default('draft');
+        $table->softDeletes();
+        $table->timestamps();
+    });
     }
 
     /**

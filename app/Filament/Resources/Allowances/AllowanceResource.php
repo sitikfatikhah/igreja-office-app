@@ -21,7 +21,7 @@ class AllowanceResource extends Resource
 
     protected static ?string $cluster = PayrollsCluster::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Banknotes;
 
     public static function form(Schema $schema): Schema
     {

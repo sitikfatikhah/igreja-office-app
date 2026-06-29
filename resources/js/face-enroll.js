@@ -52,44 +52,26 @@ function stopVideo(video) {
     liveStream = null;
 }
 
-function resolveLivewireComponent(element) {
-    if (!window.Livewire || !element) {
-        console.error('[face-enroll] Livewire atau element tidak tersedia.');
-        return null;
+function resolveLivewireComponent() {
+    const roots = document.querySelectorAll('[wire\\:id]');
+
+    for (const root of roots) {
+
+        const componentId = root.getAttribute('wire:id');
+
+        const component =
+            window.Livewire.find(componentId);
+
+        if (
+            component &&
+            component.name &&
+            component.name.includes('enroll-face')
+        ) {
+            return component;
+        }
     }
 
-    // Cari parent element yang memiliki atribut wire:id
-    const root =
-        element.closest('[wire\\:id]') ||
-        document.querySelector('[wire\\:id]');
-
-    if (!root) {
-        console.error('[face-enroll] Root Livewire component tidak ditemukan.');
-        return null;
-    }
-
-    const componentId = root.getAttribute('wire:id');
-
-    if (!componentId) {
-        console.error('[face-enroll] wire:id tidak ditemukan.');
-        return null;
-    }
-
-    if (typeof window.Livewire.find !== 'function') {
-        console.error('[face-enroll] Livewire.find() tidak tersedia.');
-        return null;
-    }
-
-    const component = window.Livewire.find(componentId);
-
-    if (!component) {
-        console.error('[face-enroll] Component Livewire tidak ditemukan.');
-        return null;
-    }
-
-    console.debug('[face-enroll] Livewire component ditemukan:', componentId);
-
-    return component;
+    return null;
 }
 
 
@@ -194,10 +176,11 @@ async function init() {
 
         descriptorInput.value = lastDescriptor;
         referencePhotoInput.value = lastReferencePhoto;
-        descriptorInput.dispatchEvent(new Event('input', { bubbles: true }));
-        descriptorInput.dispatchEvent(new Event('change', { bubbles: true }));
-        referencePhotoInput.dispatchEvent(new Event('input', { bubbles: true }));
-        referencePhotoInput.dispatchEvent(new Event('change', { bubbles: true }));
+        // descriptorInput.dispatchEvent(new Event('input', { bubbles: true }));
+        // descriptorInput.dispatchEvent(new Event('change', { bubbles: true }));
+
+        // referencePhotoInput.dispatchEvent(new Event('input', { bubbles: true }));
+        // referencePhotoInput.dispatchEvent(new Event('change', { bubbles: true }));
 
         showReviewMode(referencePhoto);
         stopVideo(video);
@@ -258,8 +241,32 @@ async function init() {
         }
     });
 
+    
+
     // showCaptureMode();
 }
 
 
-document.addEventListener('DOMContentLoaded', init);
+function tryInitFaceEnroll() {
+    if (window._faceEnrollInitialized) return;
+
+    const video = document.getElementById('video');
+    const captureBtn = document.getElementById('captureBtn');
+    // Ensure the view has rendered the expected elements (works with Livewire)
+    if (!video || !captureBtn) return;
+
+    try {
+        init();
+        window._faceEnrollInitialized = true;
+        console.debug('[face-enroll] initialized');
+    } catch (err) {
+        console.error('[face-enroll] initialization failed', err);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', tryInitFaceEnroll);
+document.addEventListener('livewire:load', tryInitFaceEnroll);
+document.addEventListener('livewire:update', tryInitFaceEnroll);
+if (window.Livewire && typeof window.Livewire.hook === 'function') {
+    window.Livewire.hook('message.processed', tryInitFaceEnroll);
+}

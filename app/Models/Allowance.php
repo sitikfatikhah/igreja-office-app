@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Allowance extends Model
 {
     protected $fillable = [
-        'user_id',
         'type',
         'amount',
         'description',

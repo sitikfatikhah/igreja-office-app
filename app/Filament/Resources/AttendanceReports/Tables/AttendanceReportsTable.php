@@ -2,7 +2,14 @@
 
 namespace App\Filament\Resources\AttendanceReports\Tables;
 
+use App\Filament\Exports\AttendanceReportExporter;
+use App\Filament\Resources\AttendanceReports\AttendanceReportResource;
+use App\Filament\Resources\AttendanceReports\Pages\ViewAttendanceReport;
+use App\Filament\Resources\Attendances\AttendanceResource;
+use App\Filament\Resources\Attendances\Pages\ListAttendances;
+use App\Filament\Resources\Attendances\Pages\ViewAttendance;
 use App\Models\Attendance;
+use App\Models\AttendanceReport;
 use App\Models\User;
 use App\Services\AttendanceReportService;
 use Carbon\Carbon;
@@ -10,6 +17,8 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\Exports\Enums\Contracts\ExportFormat;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\DatePicker;
@@ -19,6 +28,7 @@ use Filament\Tables\Columns\CheckboxColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TrashedFilter;
@@ -30,72 +40,76 @@ class AttendanceReportsTable
     public static function configure(Table $table): Table
     {
         return $table
+        ->paginationMode(PaginationMode::Simple)
+        ->striped()
+        ->query(AttendanceReport::query()->with('user'))
             ->columns([
-                TextColumn::make('user_id')
-                    ->numeric()
-                    ->sortable(),
-                TextColumn::make('nip')
-                    ->label('NIP')
-                    ->searchable(),
-                TextColumn::make('position')
-                    ->searchable(),
-                TextColumn::make('check_in')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('check_out')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('total_hours')
-                    ->numeric()
-                    ->label('Working Hours')
-                    ->state(function ($record) {
-                        if (!$record->check_in || !$record->check_out) {
-                            return '-';
-                        }
+            TextColumn::make('user.name')
+                ->label('Employee')
+                ->searchable()
+                ->sortable(),
 
-                        $start = Carbon::parse($record->check_in);
-                        $end = Carbon::parse($record->check_out);
+            TextColumn::make('user.nip')
+                ->label('NIP')
+                ->searchable(),
 
-                        return round($start->diffInMinutes($end) / 60, 2) . ' hrs';
-                    })
-                    ->sortable(),
-                TextColumn::make('date')
-                    ->date()
-                    ->sortable(),
-                IconColumn::make('face_verified')
-                    ->label('Face Verified')
-                    ->boolean()
-                    ->sortable(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->paginated(false)
-            ->query(Attendance::query()->with('user'))
+            TextColumn::make('total_hours')
+                ->label('Working Hours')
+                ->suffix(' hrs')
+                ->sortable(),
 
+            TextColumn::make('total_overtime')
+                ->label('Overtime')
+                ->suffix(' hrs'),
+
+            TextColumn::make('total_late')
+                ->label('Late')
+                ->suffix(' hrs'),
+
+            TextColumn::make('status')
+                ->badge()
+                ->color(fn (string $state) => match ($state) {
+                    'present' => 'success',
+                    'late' => 'warning',
+                    'overtime' => 'info',
+                    'absent' => 'danger',
+                    default => 'gray',
+                }),
+            TextColumn::make('periode')
+                ->label('Periode')
+                ->state(function($record){
+                return Carbon::parse($record->start_date)->translatedFormat('d M Y')
+                    . ' to ' .
+                    Carbon::parse($record->end_date)->translatedFormat('d M Y');
+                }),
+
+            TextColumn::make('report_date')
+                ->date()
+                ->sortable(),
+        ])
+            ->paginated(true)
+            ->defaultSort('report_date', 'desc')
+            ->deferFilters(false)
             ->filters([
                 SelectFilter::make('user_id')
                     ->label('Karyawan')
-                    ->options(
-                        User::query()
-                            ->get()
-                            ->mapWithKeys(fn ($user) => [
-                                $user->id => "{$user->nip} - {$user->name}"
-                            ])
-                    )
-                    ->query(function (Builder $query, array $data) {
-                        return $query->when(
-                            $data['value'] ?? null,
-                            fn (Builder $query, $value) =>$query->where('user_id', $value)
-                        );
-                    }),
-                Filter::make('date')
-                    ->label('Tanggal')
+                    ->relationship('user', 'name')
+                    ->preload(),
+                    // ->options(
+                    //     User::query()
+                    //         ->get()
+                    //         ->mapWithKeys(fn ($user) => [
+                    //             $user->id => "{$user->nip} - {$user->name}"
+                    //         ])
+                    // )
+                    // ->query(function (Builder $query, array $data) {
+                    //     return $query->when(
+                    //         $data['value'] ?? null,
+                    //         fn (Builder $query, $value) =>$query->where('user_id', $value)
+                    //     );
+                    // }),
+                Filter::make('period')
+                    ->label('Period')
                     ->form([
                         DatePicker::make('from')
                         ->label('from'),
@@ -105,20 +119,28 @@ class AttendanceReportsTable
                     ->query(function(Builder $query, array $data){
                         return $query
                         ->when(
-                            $data['from'] ?? null,
-                            fn (Builder $query, $date) =>$query->whereDate('date', '>=', $date)
+                            $data['from'],
+                            fn (Builder $query, $date): Builder =>$query->whereDate('start_date', '>=', $date)
                         )
                         ->when(
-                            $data['until'] ?? null,
-                            fn (Builder $query, $date) =>$query->whereDate('date', '<=', $date)
+                            $data['until'],
+                            fn (Builder $query, $date): Builder =>$query->whereDate('end_date', '<=', $date)
                         );
                     }
                     ),
 
 
-                TrashedFilter::make(),
+                // TrashedFilter::make(),
             ])
             // layout: FiltersLayout::AboveContent)
+
+            ->recordActions([
+            Action::make('View details')
+                ->Url(
+                    fn (AttendanceReport $record): string => AttendanceReportResource::getUrl('view', ['record'=> $record])
+                    )
+                ->openUrlInNewTab()
+            ])
 
             ->filtersFormColumns(2)
             
@@ -131,20 +153,27 @@ class AttendanceReportsTable
                     ForceDeleteBulkAction::make(),
                     RestoreBulkAction::make(),
                 ]),
-                Action::make('generateReport')
-                    ->label('Generate Report')
-                    ->icon('heroicon-o-arrow-path')
-                    ->action(function(){
-                        app(AttendanceReportService::class)->generateAll();
+            
+                // Action::make('generateReport')
+                //     ->label('Generate Report')
+                //     ->icon('heroicon-o-arrow-path')
+                //     ->action(function(){
+                //         app(AttendanceReportService::class)->generateAll();
                         
-                        \Filament\Notifications\Notification::make()
-                            ->title('Success')
-                            ->body('Attendance reports generated successfully')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation(),
+                //         \Filament\Notifications\Notification::make()
+                //             ->title('Success')
+                //             ->body('Attendance reports generated successfully')
+                //             ->success()
+                //             ->send();
+                //     })
+                //     ->requiresConfirmation(),
+            ])
+
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(AttendanceReportExporter::class)
             ]);
+            
             
     }
 }

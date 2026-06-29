@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Table;
 
 class UsersTable
@@ -14,6 +15,8 @@ class UsersTable
     public static function configure(Table $table): Table
     {
         return $table
+        ->paginationMode(PaginationMode::Simple)
+        ->striped()
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),

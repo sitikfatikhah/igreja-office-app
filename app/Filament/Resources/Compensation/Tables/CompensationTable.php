@@ -7,9 +7,11 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
+use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Table;
 
 class CompensationTable
@@ -17,38 +19,22 @@ class CompensationTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->paginationMode(PaginationMode::Simple)
+            ->striped()
             ->columns([
+                TextColumn::make('user_id')
+                    ->label('Karyawan'),
                 TextColumn::make('basic_salary')
                     ->label('Basic Salary')
                     ->money('idr', true),
-                TextColumn::make('position_allowance')
-                    ->label('Position Allowance')
-                    ->money('idr', true),
-                TextColumn::make('transport_allowance')
-                    ->label('Transport Allowance')
-                    ->money('idr', true),
-                TextColumn::make('meal_allowance')
-                    ->label('Meal Allowance')
-                    ->money('idr', true),
-                TextColumn::make('communication_allowance')
-                    ->label('Communication Allowance')
-                    ->money('idr', true),
-                TextColumn::make('health_benefit')
-                    ->label('Health Benefit')
-                    ->money('idr', true),
-                TextColumn::make('insurance_benefit')
-                    ->label('Insurance Benefit')
-                    ->money('idr', true),
-                TextColumn::make('retirement_benefit')
-                    ->label('Retirement Benefit')
-                    ->money('idr', true),
                 TextColumn::make('effective_date')
                     ->label('Effective Date')
-                    ->dateTime(),
-                TextColumn::make('end_date')
-                    ->label('End Date')
-                    ->dateTime(),
-                ToggleColumn::make('is_active')
+                    ->date('M j, Y'),
+                IconColumn::make('is_active')
+                    ->label('Is Active')
+                    ->boolean()
+                    ->trueColor('info')
+                    ->falseColor('warning')
                     ->label('Is Active'),
                 TextColumn::make('notes')
                     ->label('Notes')

@@ -2,14 +2,21 @@
 
 namespace App\Filament\Resources\Attendances\Tables;
 
+use App\Filament\Exports\AttendanceExporter;
+use App\Models\User;
 use Dom\Text;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AttendancesTable
 {
@@ -41,8 +48,44 @@ class AttendancesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                SelectFilter::make('user_id')
+                    ->label('Karyawan')
+                    ->options(
+                        User::query()
+                            ->get()
+                            ->mapWithKeys(fn ($user) => [
+                                $user->id => "{$user->nip} - {$user->name}"
+                            ])
+                    )
+                    ->query(function (Builder $query, array $data) {
+                        return $query->when(
+                            $data['value'] ?? null,
+                            fn (Builder $query, $value) =>$query->where('user_id', $value)
+                        );
+                    }),
+                Filter::make('date')
+                    ->label('Tanggal')
+                    ->form([
+                        DatePicker::make('from')
+                        ->label('from'),
+                        DatePicker::make('until')
+                        ->label('to')
+                    ])
+                    ->query(function(Builder $query, array $data){
+                        return $query
+                        ->when(
+                            $data['from'] ?? null,
+                            fn (Builder $query, $date) =>$query->whereDate('date', '>=', $date)
+                        )
+                        ->when(
+                            $data['until'] ?? null,
+                            fn (Builder $query, $date) =>$query->whereDate('date', '<=', $date)
+                        );
+                    }
+                    ),
+                // TrashedFilter::make(),
             ])
+            
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -51,6 +94,8 @@ class AttendancesTable
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
+                ExportAction::make()
+                ->exporter(AttendanceExporter::class)
             ]);
     }
 }

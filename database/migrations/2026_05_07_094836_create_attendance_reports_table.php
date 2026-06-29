@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('attendance_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->date('date')->nullable();
-            $table->timestamp('check_in');
-            $table->timestamp('check_out')->nullable();
+            $table->date('start_date')->nullable();
+            $table->date('end_date')->nullable();
             $table->integer('total_hours')->default(0);
-            $table->boolean('is_late')->default(false);
-            $table->boolean('is_overtime')->default(false);
-            $table->boolean('is_face_verified')->default(true);
+            $table->integer('total_late')->default(false);
+            $table->integer('total_overtime')->default(false);
             $table->string('status')->default('present');
+            $table->string('report_date')->default('present');
+            $table->string('description')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

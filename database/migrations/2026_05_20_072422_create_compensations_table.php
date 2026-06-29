@@ -13,17 +13,10 @@ return new class extends Migration
     {
         Schema::create('compensations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('basic_salary');
-            $table->integer('position_allowance');
-            $table->integer('transport_allowance');
-            $table->integer('meal_allowance');
-            $table->integer('communication_allowance');
-            $table->integer('health_benefit');
-            $table->integer('insurance_benefit');
-            $table->integer('retirement_benefit');
             $table->dateTime('effective_date');
-            $table->dateTime('end_date');
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(true);
             $table->text('notes')->nullable();
             $table->timestamps();
         });

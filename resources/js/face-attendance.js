@@ -1,6 +1,12 @@
 import * as faceapi from 'face-api.js';
 
 window.initFaceAttendance = async function () {
+    if (window.faceAttendanceInitialized) {
+        return;
+    }
+
+    window.faceAttendanceInitialized = true;
+
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
     const status = document.getElementById('status');
@@ -179,21 +185,56 @@ window.initFaceAttendance = async function () {
     }
 
     async function saveEnrollment() {
-        if (!capturedDescriptor || !capturedImage) {
-            status.innerText = 'Belum ada data wajah.';
-            return;
+    try {
+
+        status.innerText = 'Mengambil lokasi GPS...';
+
+        const gps = await getGps();
+
+        console.log('GPS FOUND', gps);
+
+        const livewireEl = document.querySelector('[wire\\:id]');
+
+        if (!livewireEl) {
+            throw new Error('Livewire component tidak ditemukan');
         }
 
-        status.innerText = 'Menyimpan data...';
+        const component =
+            window.Livewire.find(
+                livewireEl.getAttribute('wire:id')
+            );
 
-        const submitButton = document.querySelector(
-            'button[type="submit"]'
+        if (!component) {
+            throw new Error('CreateAttendance component tidak ditemukan');
+        }
+        
+        await component.$wire.set(
+            'data.latitude',
+            Number(gps.latitude)
         );
 
-        if (submitButton) {
-            submitButton.click();
+        await component.$wire.set(
+            'data.longitude',
+            Number(gps.longitude)
+        );
+
+        await component.$wire.set(
+            'data.location_name',
+            'GPS Device'
+        );
+
+        console.log('GPS SAVED TO LIVEWIRE');
+
+        submitButton.click();
+
+        } catch (error) {
+
+            console.error(error);
+
+            status.innerText =
+                'Gagal memperoleh GPS: ' + error.message;
         }
-    }
+}
 
     try {
         // Jalankan kamera dan load model

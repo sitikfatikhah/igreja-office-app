@@ -15,7 +15,9 @@ class Overtimes extends Model
         'overtime_date',
         'start_time',
         'end_time',
+        'base_pay',
         'total_hours',
+        'total_pay',
         'description',
         'approval_status',
         'approved_by',
@@ -27,5 +29,10 @@ class Overtimes extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function approvedBy()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 }

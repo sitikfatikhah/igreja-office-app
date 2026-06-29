@@ -23,7 +23,7 @@ class AttendanceResource extends Resource
 
     protected static ?string $cluster = AttendancesCluster::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::FingerPrint;
 
     public static function form(Schema $schema): Schema
     {

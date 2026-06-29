@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Allowances\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -11,15 +12,18 @@ class AllowanceForm
     {
         return $schema
             ->components([
-                TextInput::make('user_id')
-                    ->required(),
                 TextInput::make('type')
+                    ->label('Nama')
                     ->required(),
+
                 TextInput::make('amount')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->default(0),
+
                 TextInput::make('description')
-                    ->required(),
+                    ->label('Description')
+                    ->columnSpanFull(),
             ]);
     }
 }

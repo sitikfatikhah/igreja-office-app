@@ -65,8 +65,8 @@ class AttendanceForm
                 | Script GPS
                 |--------------------------------------------------------------------------
                 */
-                View::make('filament.forms.gps-script')
-                    ->columnSpanFull(),
+                // View::make('filament.forms.gps-script')
+                //     ->columnSpanFull(),
 
                 /*
                 |--------------------------------------------------------------------------

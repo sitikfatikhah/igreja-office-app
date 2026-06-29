@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('allowances', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
             $table->string('type');
             $table->integer('amount');
             $table->string('description')->nullable();
@@ -28,9 +27,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('allowances');
-    }
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 };

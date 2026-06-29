@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\EnrollFaceController;
+use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +29,7 @@ Route::middleware('auth')->group(function () {
     
     Route::get('/create', [UserController::class, 'create'])->name('users.create');
     Route::get('{record}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+    Route::get('/payrolls/{id}/slip', [PayrollController::class, 'slip'])->name('payroll.slip');  
 });
 

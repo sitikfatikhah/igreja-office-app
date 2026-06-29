@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Attendances\Pages;
 
+use App\Filament\Clusters\Attendances\AttendancesCluster;
 use App\Filament\Resources\Attendances\AttendanceResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
@@ -17,4 +18,6 @@ class ViewAttendance extends ViewRecord
             EditAction::make(),
         ];
     }
+    
+
 }

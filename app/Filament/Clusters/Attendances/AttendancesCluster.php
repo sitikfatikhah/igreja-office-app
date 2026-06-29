@@ -9,7 +9,7 @@ use Filament\Support\Icons\Heroicon;
 
 class AttendancesCluster extends Cluster
 {
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
 
