@@ -50,7 +50,6 @@ class PayrollExporter extends Exporter
 
             ExportColumn::make('status')
                 ->label('Status'),
-
             
         ];
     }

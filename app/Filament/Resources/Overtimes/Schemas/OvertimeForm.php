@@ -25,68 +25,83 @@ class OvertimeForm
         return $schema
             ->components([
                     Select::make('user_id')
-                        ->label('User ID')
-                        ->options(fn () =>User::pluck('name', 'id'))
+                        ->label('User')
+                        ->options(fn () => User::pluck('name', 'id'))
                         ->live()
-                        ->afterStateUpdated(function(Get $get, Set $set){
+                        ->afterStateUpdated(function (Get $get, Set $set) {
                             $userId = $get('user_id');
                             $user = User::find($userId);
                             $set('position', $user?->position);
                         })
-                        ->required(),
+                        ->required()
+                        ->helperText('Select an employee.'),
+
                     TextInput::make('position')
-                        ->label('Jabatan')
+                        ->label('Position')
                         ->disabled()
                         ->dehydrated()
-                        ->required(),
+                        ->required()
+                        ->helperText('Employee position.'),
+
                     DatePicker::make('overtime_date')
                         ->label('Overtime Date')
                         ->date()
-                        ->required(),
+                        ->required()
+                        ->helperText('Select the overtime date.'),
+
                     TextInput::make('total_hours')
                         ->label('Total Hours')
                         ->disabled()
                         ->numeric()
-                        ->required(),
+                        ->required()
+                        ->helperText('Calculated overtime hours.'),
+
                     TimePicker::make('start_time')
                         ->label('Start Time')
                         ->time()
-                        ->live() // Update total hours in real-time as start_time and end_time change
-                        
-                        ->afterStateUpdated(function(Get $get, Set $set){
+                        ->live()
+                        ->afterStateUpdated(function (Get $get, Set $set) {
                             static::calculateTotalHours($get, $set);
                         })
-                        ->required(),
+                        ->required()
+                        ->helperText('Select the start time.'),
+
                     TimePicker::make('end_time')
                         ->label('End Time')
                         ->time()
-                        ->live() // Update total hours in real-time as start_time and end_time change
-                        ->afterStateUpdated(function(Get $get, Set $set){
+                        ->live()
+                        ->afterStateUpdated(function (Get $get, Set $set) {
                             static::calculateTotalHours($get, $set);
                         })
-                        ->required(),
-                    
+                        ->required()
+                        ->helperText('Select the end time.'),
+
                     TextInput::make('description')
                         ->label('Description')
-                        ->required(),
+                        ->required()
+                        ->helperText('Enter the work description.'),
+
                     Select::make('approval_status')
                         ->label('Approval Status')
                         ->options([
                             'Pending' => 'Pending',
                             'Approved' => 'Approved',
-                            'Rejected   ' => 'Rejected',
+                            'Rejected' => 'Rejected',
                         ])
-                        ->required(),
+                        ->required()
+                        ->helperText('Select the approval status.'),
+
                     TextInput::make('approved_by')
                         ->default(fn () => auth()->user()?->name)
-                        // ->disabled(fn ($record) => auth()->user()->id !==null)
                         ->disabled()
-                        ->label('Approved By'),
+                        ->label('Approved By')
+                        ->helperText('Approver name.'),
+
                     Textarea::make('reason')
                         ->rows(3)
                         ->autosize()
-                        ->label('Reason'),
-
+                        ->label('Reason')
+                        ->helperText('Enter the reason for overtime.'),
             ]);
     }
 

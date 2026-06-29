@@ -26,35 +26,41 @@ class TimeBankRequestForm
                         $user = User::find($userId);
                         $set('position', $user?->position);
                     })
-                    ->required(),
+                    ->required()
+                    ->helperText('Pilih pegawai.'),
                 TextInput::make('position')
                     ->label('Jabatan')
                     ->disabled()
                     ->dehydrated()
-                    ->required(),
+                    ->required()
+                    ->helperText('Jabatan pegawai.'),
                 DatePicker::make('request_date')
                     ->label('Request Date')
                     ->date()
-                    ->required(),
+                    ->required()
+                    ->helperText('Tanggal pengajuan.'),
                 Textarea::make('reason')
                     ->label('Reason')
-                    ->required(),
+                    ->required()
+                    ->helperText('Alasan pengajuan.'),
                 Select::make('approval_status')
                     ->label('Approval Status')
                     ->default('Pending')
-                    ->disabled(fn() =>auth()->user()->hasRole('user')) // Disable for regular users
+                    ->disabled(fn() =>auth()->user()->hasRole('user'))
                     ->options([
                         'Pending' => 'Pending',
                         'Approved' => 'Approved',
                         'Rejected' => 'Rejected',
                     ])
-                    ->required(),
+                    ->required()
+                    ->helperText('Status persetujuan.'),
                 Select::make('approved_by')
                     ->label('Approved By')
                     ->options(fn () =>User::pluck('name', 'id'))
                     ->live()
                     ->default('pending')
-                    ->disabled(fn() =>auth()->user()->hasRole('user')), // Disable for regular users
+                    ->disabled(fn() =>auth()->user()->hasRole('user'))
+                    ->helperText('Disetujui oleh.'), // Disable for regular users
             ]);
     }
 }

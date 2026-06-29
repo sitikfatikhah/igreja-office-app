@@ -3,6 +3,7 @@
 namespace App\Filament\Exports;
 
 use App\Models\Attendance;
+use App\Models\Overtimes;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -15,6 +16,7 @@ class AttendanceDetailExporter extends Exporter
     public static function getColumns(): array
     {
         return [
+            ExportColumn::make('user.name'),
             ExportColumn::make('date')
                 ->label('Date')
                 ->formatStateUsing(fn ($state) => $state?->format('d M Y')),
@@ -45,7 +47,7 @@ class AttendanceDetailExporter extends Exporter
 
             ExportColumn::make('overtime_hours')
                 ->label('Overtime (hrs)')
-                ->state(fn (Attendance $record) => $record->overtime_hours),
+                ->state(fn (Overtimes $record) => $record->total_hours),
 
             ExportColumn::make('check_in_location_name')
                 ->label('Location Check In')

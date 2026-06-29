@@ -13,17 +13,20 @@ class AllowanceForm
         return $schema
             ->components([
                 TextInput::make('type')
-                    ->label('Nama')
-                    ->required(),
+                    ->label('Name')
+                    ->required()
+                    ->helperText('Enter the allowance name.'),
 
                 TextInput::make('amount')
                     ->required()
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->helperText('Enter the allowance amount.'),
 
                 TextInput::make('description')
                     ->label('Description')
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->helperText('Enter a brief description.'),
             ]);
     }
 }

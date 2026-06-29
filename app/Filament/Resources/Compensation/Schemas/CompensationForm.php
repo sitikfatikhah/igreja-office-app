@@ -19,16 +19,20 @@ class CompensationForm
                     ->label('Karyawan')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->helperText('Pilih karyawan.'),
                 TextInput::make('basic_salary')
                     ->label('Basic Salary')
-                    ->numeric(),
+                    ->numeric()
+                    ->helperText('Gaji pokok karyawan.'),
                 DatePicker::make('effective_date')
                     ->label('Effective Date')
-                    ->required(),
+                    ->required()
+                    ->helperText('Tanggal berlaku.'),
                 TextInput::make('notes')
                     ->label('Notes')
-                    ->nullable(),
+                    ->nullable()
+                    ->helperText('Catatan singkat.'),
             ]);
     }
 }

@@ -30,8 +30,9 @@ class LeaveRequestForm
                                 titleAttribute:'name',
                                 modifyQueryUsing: fn (Builder $query)=> $query->whereHas('roles', fn (Builder $query) => $query->where('name', 'user'))
                             )
-                            ->disabled(fn() => auth()->user()->hasRole('user')) // Disable for regular users
-                            ->required(),
+                            ->disabled(fn() => auth()->user()->hasRole('user'))
+                            ->required()
+                            ->helperText('Pilih pegawai.'),
                         Select::make('leave_type')
                             ->label('Leave Type')
                             ->options([
@@ -42,21 +43,26 @@ class LeaveRequestForm
                                 'Bereavement' => 'Bereavement Leave',
                                 'Emergency' => 'Emergency Leave',
                                 ])
-                                ->required(),
+                                ->required()
+                                ->helperText('Jenis cuti.'),
                         DatePicker::make('start_date')
                             ->label('Start Date')
-                            ->required(),
+                            ->required()
+                            ->helperText('Tanggal mulai cuti.'),
                         DatePicker::make('end_date')
                             ->label('End Date')
-                            ->required(),
+                            ->required()
+                            ->helperText('Tanggal selesai cuti.'),
                         TextInput::make('total_days')
                             ->label('Total Days')
                             ->fn(getStateUsing: fn (callable $get) => optional($get('start_date'))->diffInDays(optional($get('end_date'))) + 1)
                             ->disabled()
-                            ->required(),
+                            ->required()
+                            ->helperText('Jumlah hari cuti.'),
                         Textarea::make('reason')
                             ->label('Reason for Leave')
-                            ->required(),
+                            ->required()
+                            ->helperText('Alasan cuti.'),
                         Select::make('approval_status')
                             ->label('Approval Status')
                             ->options([
@@ -65,8 +71,9 @@ class LeaveRequestForm
                                 'Rejected' => 'Rejected',
                             ])
                             ->default('Pending')
-                            ->disabled(fn() => auth()->user()->hasRole('user')) // Disable for regular users
-                            ->required(),
+                            ->disabled(fn() => auth()->user()->hasRole('user'))
+                            ->required()
+                            ->helperText('Status persetujuan.'),
                     ]),
             ]);
     }

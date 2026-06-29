@@ -7,7 +7,6 @@ use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Livewire\Attributes\On;
 
 class CreateAttendance extends CreateRecord
 {
@@ -15,7 +14,61 @@ class CreateAttendance extends CreateRecord
 
     protected static ?string $cluster = AttendancesCluster::class;
 
-   
+    /**
+     * Sembunyikan tombol bawaan Filament (Create, Create & create another,
+     * Cancel) sepenuhnya dari halaman ini.
+     *
+     * PENTING: ini untuk mencegah bug di mana user mengklik tombol "Create"
+     * bawaan secara langsung — itu akan submit form Livewire standar TANPA
+     * melalui alur custom kita (kamera → GPS → verifikasi wajah →
+     * submitAttendance()), sehingga latitude/longitude masih null dan
+     * selalu gagal dengan notifikasi "GPS belum ditemukan". Dengan tombol
+     * bawaan disembunyikan, satu-satunya cara submit adalah lewat tombol
+     * custom "Verify & Check In/Out" di face-attendance-script.blade.php.
+     */
+    protected function getFormActions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Dipanggil langsung dari JS via $wire.submitAttendance(...).
+     *
+     * Pendekatan ini dipilih (bukan component.set() berulang + form submit)
+     * karena data dikirim sebagai ARGUMEN method call, bukan lewat property
+     * yang di-set satu-satu lalu diharap "nyangkut" sebelum create() jalan.
+     * Argumen method selalu sampai utuh dalam SATU request Livewire — tidak
+     * ada lagi kemungkinan race condition, defer yang belum terkirim, atau
+     * referensi komponen yang stale.
+     */
+    public function submitAttendance(
+        ?float $latitude,
+        ?float $longitude,
+        ?string $locationName,
+        bool $faceVerified,
+        ?float $verificationScore,
+    ): void {
+        logger()->info('SUBMIT ATTENDANCE CALLED', [
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'location_name' => $locationName,
+            'face_verified' => $faceVerified,
+            'verification_score' => $verificationScore,
+        ]);
+
+        $this->form->fill([
+            ...$this->form->getState(),
+            'latitude' => $latitude,
+            'longitude' => $longitude,
+            'location_name' => $locationName,
+            'face_verified' => $faceVerified,
+            'verification_score' => $verificationScore,
+            'verification_method' => 'face_recognition',
+        ]);
+
+        $this->create();
+    }
+
     /**
      * Validasi lokasi absensi.
      */
@@ -34,30 +87,24 @@ class CreateAttendance extends CreateRecord
             return false;
         }
 
-        $distance = $this->calculateDistanceMeters(
+        $distance = Attendance::calculateDistanceMeters(
             $latitude,
             $longitude,
-            (float) config('attendance.office_latitude'),
-            (float) config('attendance.office_longitude')
+            Attendance::officeLatitude(),
+            Attendance::officeLongitude()
         );
 
         logger()->info('ATTENDANCE DISTANCE', [
             'user_latitude' => $latitude,
             'user_longitude' => $longitude,
-            'office_latitude' => config('attendance.office_latitude'),
-            'office_longitude' => config('attendance.office_longitude'),
+            'office_latitude' => Attendance::officeLatitude(),
+            'office_longitude' => Attendance::officeLongitude(),
             'distance_meter' => round($distance, 2),
-            'allowed_radius' => config('attendance.radius'),
-            'allowed' => $distance <= config('attendance.radius'),
+            'allowed_radius' => Attendance::officeRadius(),
+            'allowed' => $distance <= Attendance::officeRadius(),
         ]);
 
-        Notification::make()
-            ->title('Debug Lokasi')
-            ->body('Jarak Anda: ' . round($distance) . ' meter')
-            ->info()
-            ->send();
-
-        return $distance <= config('attendance.radius');
+        return $distance <= Attendance::officeRadius();
     }
 
     /**
@@ -67,15 +114,22 @@ class CreateAttendance extends CreateRecord
     {
         logger()->info('FORM DATA', $data);
 
-        $latitude = isset($data['latitude'])
+        $latitude = isset($data['latitude']) && $data['latitude'] !== '' && is_numeric($data['latitude'])
             ? (float) $data['latitude']
             : null;
 
-        $longitude = isset($data['longitude'])
+        $longitude = isset($data['longitude']) && $data['longitude'] !== '' && is_numeric($data['longitude'])
             ? (float) $data['longitude']
             : null;
 
         $locationName = $data['location_name'] ?? null;
+
+        logger()->warning('FINAL GPS CHECK', [
+            'raw_lat' => $data['latitude'] ?? null,
+            'raw_lng' => $data['longitude'] ?? null,
+            'parsed_lat' => $latitude,
+            'parsed_lng' => $longitude,
+        ]);
 
         logger()->info('GPS RECEIVED', [
             'latitude' => $latitude,
@@ -83,7 +137,7 @@ class CreateAttendance extends CreateRecord
             'location_name' => $locationName,
         ]);
 
-        if ($latitude === null || $longitude === null) {
+        if (! is_numeric($latitude) || ! is_numeric($longitude)) {
 
             Notification::make()
                 ->title('GPS belum ditemukan')
@@ -105,6 +159,18 @@ class CreateAttendance extends CreateRecord
 
         // CHECK OUT
         if ($attendanceToday) {
+
+            if ($attendanceToday->check_out) {
+                Notification::make()
+                    ->title('Check-out sudah dilakukan')
+                    ->body('Anda sudah melakukan check-out hari ini.')
+                    ->warning()
+                    ->send();
+
+                $this->halt();
+
+                return [];
+            }
 
             if (! $this->isCheckInLocationAllowed(
                 $latitude,
@@ -134,13 +200,8 @@ class CreateAttendance extends CreateRecord
                 ->success()
                 ->send();
 
+            $this->redirect(AttendanceResource::getUrl('index'));
             $this->halt();
-
-            $this->redirect(
-                AttendanceResource::getUrl('index')
-            );
-
-            return [];
         }
 
         // CHECK IN
@@ -184,35 +245,6 @@ class CreateAttendance extends CreateRecord
         return $data;
     }
 
-    /**
-     * Hitung jarak GPS.
-     */
-    protected function calculateDistanceMeters(
-        float $lat1,
-        float $lon1,
-        float $lat2,
-        float $lon2
-        ): float {
-
-            $earthRadius = 6371000;
-
-            $dLat = deg2rad($lat2 - $lat1);
-            $dLon = deg2rad($lon2 - $lon1);
-
-            $a =
-                sin($dLat / 2) * sin($dLat / 2)
-                + cos(deg2rad($lat1))
-                * cos(deg2rad($lat2))
-                * sin($dLon / 2)
-                * sin($dLon / 2);
-
-            $c = 2 * atan2(
-                sqrt($a),
-                sqrt(1 - $a)
-            );
-
-            return $earthRadius * $c;
-    }
 
     protected function getRedirectUrl(): string
     {

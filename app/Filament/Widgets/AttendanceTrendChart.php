@@ -3,21 +3,53 @@
 namespace App\Filament\Widgets;
 
 use App\Models\AttendanceReport;
+use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\DB;
 
 class AttendanceTrendChart extends ChartWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 5;
 
-    protected ?string $heading = 'Attendance Trend Chart';
+    protected ?string $heading = 'Attendance Trend';
+
+    protected ?string $description = 'Total working hours, late hours, and overtime hours over time.';
+
+    protected ?string $pollingInterval = '60s';
+
+    // Tampilkan beberapa filter rentang bawaan ChartWidget sebagai pelengkap filter dashboard
+    protected function getFilters(): ?array
+    {
+        return [
+            'daily' => 'Daily (selected range)',
+            'monthly' => 'Monthly (this year)',
+        ];
+    }
 
     protected function getData(): array
+    {
+        $filter = $this->filter ?? 'monthly';
+
+        return $filter === 'daily'
+            ? $this->dailyData()
+            : $this->monthlyData();
+    }
+
+    /**
+     * Mode bulanan: total jam kerja per bulan pada tahun berjalan.
+     * Dipertahankan dari versi awal sebagai default view.
+     */
+    protected function monthlyData(): array
     {
         $data = AttendanceReport::query()
             ->select(
                 DB::raw('MONTH(report_date) as month'),
-                DB::raw('SUM(total_hours) as total_hours')
+                DB::raw('SUM(total_hours) as total_hours'),
+                DB::raw('SUM(total_late) as total_late'),
+                DB::raw('SUM(total_overtime) as total_overtime')
             )
             ->whereYear('report_date', now()->year)
             ->groupBy('month')
@@ -29,6 +61,23 @@ class AttendanceTrendChart extends ChartWidget
                 [
                     'label' => 'Working Hours',
                     'data' => $data->pluck('total_hours')->toArray(),
+                    'borderColor' => '#22c55e',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
+                    'fill' => true,
+                ],
+                [
+                    'label' => 'Late Hours',
+                    'data' => $data->pluck('total_late')->toArray(),
+                    'borderColor' => '#f59e0b',
+                    'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
+                    'fill' => true,
+                ],
+                [
+                    'label' => 'Overtime Hours',
+                    'data' => $data->pluck('total_overtime')->toArray(),
+                    'borderColor' => '#3b82f6',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'fill' => true,
                 ],
             ],
             'labels' => $data
@@ -38,8 +87,101 @@ class AttendanceTrendChart extends ChartWidget
         ];
     }
 
+    /**
+     * Mode harian: memakai rentang startDate/endDate dari filter Dashboard.
+     * report_date di-cast sebagai string ('Y-m-d') sesuai migration, jadi
+     * perbandingannya tetap lewat whereBetween pada string tanggal.
+     */
+    protected function dailyData(): array
+    {
+        $filters = $this->filters ?? [];
+
+        $start = isset($filters['startDate'])
+            ? Carbon::parse($filters['startDate'])
+            : now()->subDays(13);
+
+        $end = isset($filters['endDate'])
+            ? Carbon::parse($filters['endDate'])
+            : now();
+
+        $data = AttendanceReport::query()
+            ->select(
+                'report_date',
+                DB::raw('SUM(total_hours) as total_hours'),
+                DB::raw('SUM(total_late) as total_late'),
+                DB::raw('SUM(total_overtime) as total_overtime')
+            )
+            ->whereBetween('report_date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
+            ->groupBy('report_date')
+            ->orderBy('report_date')
+            ->get()
+            ->keyBy('report_date');
+
+        $labels = [];
+        $hours = [];
+        $late = [];
+        $overtime = [];
+
+        $cursor = $start->copy();
+        while ($cursor->lte($end)) {
+            $key = $cursor->format('Y-m-d');
+            $row = $data->get($key);
+
+            $labels[] = $cursor->format('d M');
+            $hours[] = $row?->total_hours ?? 0;
+            $late[] = $row?->total_late ?? 0;
+            $overtime[] = $row?->total_overtime ?? 0;
+
+            $cursor->addDay();
+        }
+
+        return [
+            'datasets' => [
+                [
+                    'label' => 'Working Hours',
+                    'data' => $hours,
+                    'borderColor' => '#22c55e',
+                    'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
+                    'fill' => true,
+                ],
+                [
+                    'label' => 'Late Hours',
+                    'data' => $late,
+                    'borderColor' => '#f59e0b',
+                    'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
+                    'fill' => true,
+                ],
+                [
+                    'label' => 'Overtime Hours',
+                    'data' => $overtime,
+                    'borderColor' => '#3b82f6',
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.1)',
+                    'fill' => true,
+                ],
+            ],
+            'labels' => $labels,
+        ];
+    }
+
     protected function getType(): string
     {
         return 'line';
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'plugins' => [
+                'legend' => [
+                    'display' => true,
+                    'position' => 'bottom',
+                ],
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+        ];
     }
 }

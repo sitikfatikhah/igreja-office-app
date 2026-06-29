@@ -2,50 +2,86 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\AttendanceReport;
-use App\Models\OvertimeRequest;
 use App\Models\Overtimes;
-use App\Models\Payrolls;
-use App\Models\User;
-use Filament\Widgets\StatsOverviewWidget;
-use Filament\Widgets\StatsOverviewWidget\Stat;
+use Carbon\Carbon;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Filament\Widgets\Widget;
 
-class OvertimesStats extends StatsOverviewWidget
+class OvertimesStats extends Widget
 {
-    protected static ?int $sort = 2;
-    
-    protected ?string $heading = 'Overtime Analytics';
-    
-    protected ?string $description = 'An overview of overtime analytics.';
+    use InteractsWithPageFilters;
 
-    public function getColumns(): int | array
+    protected static ?int $sort = 2;
+
+    protected ?string $pollingInterval = '60s';
+
+    protected string $view = 'filament.widgets.overtimes-stats';
+
+    public function getViewData(): array
     {
+        [$start, $end, $prevStart, $prevEnd] = $this->resolvePeriods();
+
+        // overtime_date = tanggal lembur benar-benar terjadi.
+        $currentQuery = fn () => Overtimes::query()->whereBetween('overtime_date', [$start->toDateString(), $end->toDateString()]);
+        $previousQuery = fn () => Overtimes::query()->whereBetween('overtime_date', [$prevStart->toDateString(), $prevEnd->toDateString()]);
+
+        $totalRequests = $currentQuery()->count();
+        $prevTotalRequests = $previousQuery()->count();
+
+        $pendingRequests = $currentQuery()->where('approval_status', 'pending')->count();
+        $approvedRequests = $currentQuery()->where('approval_status', 'approved')->count();
+        $prevApprovedRequests = $previousQuery()->where('approval_status', 'approved')->count();
+
+        $approvalRate = $totalRequests > 0
+            ? round(($approvedRequests / $totalRequests) * 100, 1)
+            : 0;
+
+        $prevApprovalRate = $prevTotalRequests > 0
+            ? round(($prevApprovedRequests / $prevTotalRequests) * 100, 1)
+            : 0;
+
+        $totalOvertimeHours = (float) $currentQuery()->sum('total_hours');
+
         return [
-            'md' => 3,
-            'lg' => 3,
-            'xl' => 4,
-            '2xl' => 4,
+            'approvalRate' => $approvalRate,
+            'approvalRateTrend' => $this->trendLabel($approvalRate, $prevApprovalRate),
+            'pendingRequests' => $pendingRequests,
+            'approvedRequests' => $approvedRequests,
+            'totalRequests' => $totalRequests,
+            'totalOvertimeHours' => $totalOvertimeHours,
+            'pendingPercent' => $totalRequests > 0 ? round(($pendingRequests / $totalRequests) * 100, 1) : 0,
+            'approvedPercent' => $totalRequests > 0 ? round(($approvedRequests / $totalRequests) * 100, 1) : 0,
         ];
     }
 
-    protected function getStats(): array
+    protected function resolvePeriods(): array
     {
-        $totalRequests = Overtimes::count();
-        $pendingRequests = Overtimes::where('approval_status', 'pending')->count();
-        $approvedRequests = Overtimes::where('approval_status', 'approved')->count();
-        return [
-            Stat::make('Overtime Requests', number_format($totalRequests))
-                ->description('Total Overtime requests')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('primary'),
-            Stat::make('Pending', number_format($pendingRequests))
-                ->description('Pending Overtime requests')
-                ->descriptionIcon('heroicon-m-clock')
-                ->color('warning'),
-            Stat::make('Approved', number_format($approvedRequests))
-                ->description('Approved Overtime requests')
-                ->descriptionIcon('heroicon-m-check-circle')
-                ->color('success'),
-           ];
+        $filters = $this->filters ?? [];
+
+        $start = $filters['startDate'] ?? null;
+        $end = $filters['endDate'] ?? null;
+
+        $start = $start ? Carbon::parse($start)->startOfDay() : now()->startOfMonth();
+        $end = $end ? Carbon::parse($end)->endOfDay() : now()->endOfDay();
+
+        $days = $start->diffInDays($end) + 1;
+
+        $prevEnd = $start->copy()->subDay()->endOfDay();
+        $prevStart = $prevEnd->copy()->subDays($days - 1)->startOfDay();
+
+        return [$start, $end, $prevStart, $prevEnd];
+    }
+
+    protected function trendLabel(float $current, float $previous): string
+    {
+        $diff = round($current - $previous, 1);
+
+        if ($diff == 0) {
+            return 'No change vs previous period';
+        }
+
+        $sign = $diff > 0 ? '+' : '';
+
+        return "{$sign}{$diff}pp vs previous period";
     }
 }

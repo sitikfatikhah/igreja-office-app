@@ -15,6 +15,7 @@ use App\Filament\Widgets\PayrollStats;
 use App\Filament\Widgets\PayrollStatusWidget;
 use App\Filament\Widgets\PendingApprovalWidget;
 use App\Filament\Widgets\RecentActivitiesWidget;
+use App\Services\SettingsService;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -42,8 +43,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->colors([
-                'primary' => Color::Amber,
+            ->brandLogo(fn () => app(SettingsService::class)->getCompanyLogo(auth()->user()))
+            ->brandLogoHeight('4rem')
+           ->colors([
+                'primary' => Color::hex('#3B82F6'), // Blue-500
+                'gray' => Color::Slate,
             ])
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -55,7 +59,7 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 
-                AccountWidget::class,
+                // AccountWidget::class,
                 // FilamentInfoWidget::class,
 
                 // Executive
@@ -71,8 +75,8 @@ class AdminPanelProvider extends PanelProvider
                 // PayrollStats::class,
 
                 // Monitoring
-                AttendanceTrendChart::class,
-                LeaveRequestChart::class,
+                // AttendanceTrendChart::class,
+                // LeaveRequestChart::class,
 
                 // Admin Monitoring
                 // AttendanceTodayWidget::class,

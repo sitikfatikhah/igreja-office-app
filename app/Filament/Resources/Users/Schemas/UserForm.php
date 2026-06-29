@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -16,17 +17,20 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->required(),
+                    ->required()
+                    ->helperText('Enter the user\'s full name.'),
+
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Email')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->helperText('Please enter a valid email address.'),
-                
+                    ->helperText('Enter a valid email address.'),
+
                 TextInput::make('nip')
                     ->label('NIP')
-                    ->required(),
+                    ->required()
+                    ->helperText('Enter the employee ID number.'),
 
                 Select::make('position')
                     ->label('Position')
@@ -37,7 +41,9 @@ class UserForm
                         'Intern' => 'Intern',
                         'Supervisor' => 'Supervisor',
                         'Director' => 'Director',
-                    ]),
+                    ])
+                    ->helperText('Select the employee\'s position.'),
+
                 Select::make('department')
                     ->label('Department')
                     ->options([
@@ -47,10 +53,18 @@ class UserForm
                         'Marketing' => 'Marketing',
                         'Operations' => 'Operations',
                     ])
-                    ->required(),
+                    ->required()
+                    ->helperText('Select the employee\'s department.'),
+
                 TextInput::make('password')
                     ->password()
-                    ->required(),
+                    ->required()
+                    ->helperText('Create a secure password.'),
+
+CheckboxList::make('roles')
+    ->relationship('roles', 'name')
+    ->searchable()
+    ->helperText('Select one or more roles.'),
             ]);
     }
 }

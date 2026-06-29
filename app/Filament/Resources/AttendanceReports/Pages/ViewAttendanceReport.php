@@ -6,6 +6,9 @@ use App\Filament\Exports\AttendanceDetailExporter;
 use App\Filament\Resources\AttendanceReports\AttendanceReportResource;
 use App\Models\Attendance;
 use App\Models\AttendanceReport;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\ExportAction;
@@ -98,6 +101,46 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                             $record->getRawOriginal('end_date'),
                         ])
                         ->orderBy('date');
+                }),
+             Action::make('downloadSlip')
+                ->label('Download Pdf')
+                ->icon('heroicon-o-document-arrow-down')
+                ->action(function () {
+                    $record = $this->getRecord();
+                    $user = $record->user;
+                    $startDate = Carbon::parse($record->getRawOriginal('start_date'));
+                    $endDate = Carbon::parse($record->getRawOriginal('end_date'));
+ 
+                    $attendances = Attendance::query()
+                        ->where('user_id', $record->user_id)
+                        ->whereBetween('date', [
+                            $record->getRawOriginal('start_date'),
+                            $record->getRawOriginal('end_date'),
+                        ])
+                        ->orderBy('date')
+                        ->get()
+                        ->keyBy(fn ($a) => $a->date->format('Y-m-d'));
+ 
+                    $holidays = [
+                        '2026-01-01' => 'Tahun Baru Masehi',
+                        '2026-03-20' => 'Hari Raya Nyepi',
+                        // ... isi sesuai kalender libur nasional tahun berjalan
+                    ];
+ 
+                    $pdf = Pdf::loadView(
+                        'filament.forms.attendance',
+                        [
+                            'user' => $user,
+                            'startDate' => $startDate,
+                            'endDate' => $endDate,
+                            'attendances' => $attendances,
+                            'holidays' => $holidays,
+                        ]
+                    );
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'Attendance-' . $record->id . '.pdf'
+                    );
                 }),
         ];
     }

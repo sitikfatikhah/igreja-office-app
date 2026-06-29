@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TimeBankRequests;
 
+use App\Filament\Clusters\LeaveDeposits\LeaveDepositsCluster;
 use App\Filament\Resources\TimeBankRequests\Pages\CreateTimeBankRequest;
 use App\Filament\Resources\TimeBankRequests\Pages\EditTimeBankRequest;
 use App\Filament\Resources\TimeBankRequests\Pages\ListTimeBankRequests;
@@ -17,6 +18,8 @@ use Filament\Tables\Table;
 class TimeBankRequestResource extends Resource
 {
     protected static ?string $model = TimeBankRequest::class;
+
+    protected static ?string $cluster = LeaveDepositsCluster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 

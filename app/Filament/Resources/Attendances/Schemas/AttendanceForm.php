@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Attendances\Schemas;
 
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 
@@ -13,74 +14,46 @@ class AttendanceForm
     {
         return $schema
             ->components([
-                /*
-                |--------------------------------------------------------------------------
-                | Informasi User
-                |--------------------------------------------------------------------------
-                */
+                Section::make('Attendance Verification')
+                    ->description('Allow camera and location access, then verify your face to complete attendance.')
+                    ->schema([
+                        TextInput::make('nip')
+                            ->label('NIP')
+                            ->default(fn () => auth()->user()?->nip)
+                            ->disabled()
+                            ->helperText('Employee ID number.'),
+
+                        TextInput::make('position')
+                            ->label('Position')
+                            ->default(fn () => auth()->user()?->position)
+                            ->disabled()
+                            ->helperText('Current job position.'),
+
+                        View::make('filament.forms.face-attendance-script')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(2),
+
                 Hidden::make('user_id')
                     ->default(fn () => auth()->id())
                     ->dehydrated(),
 
-                TextInput::make('nip')
-                    ->label('NIP')
-                    ->default(fn () => auth()->user()?->nip)
-                    ->disabled(),
-
-                TextInput::make('position')
-                    ->label('Jabatan')
-                    ->default(fn () => auth()->user()?->position)
-                    ->disabled()
-                    ->required(),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Tanggal Absensi
-                |--------------------------------------------------------------------------
-                */
                 Hidden::make('date')
                     ->default(fn () => now()->toDateString())
                     ->dehydrated(),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Data GPS sementara (diisi oleh gps-script.blade.php)
-                | JS akan mengisi:
-                | - data.latitude
-                | - data.longitude
-                | - data.location_name
-                |--------------------------------------------------------------------------
-                */
                 Hidden::make('latitude')
+                    ->default(null)
                     ->dehydrated(),
 
                 Hidden::make('longitude')
+                    ->default(null)
                     ->dehydrated(),
 
                 Hidden::make('location_name')
+                    ->default(null)
                     ->dehydrated(),
 
-                /*
-                |--------------------------------------------------------------------------
-                | Script GPS
-                |--------------------------------------------------------------------------
-                */
-                // View::make('filament.forms.gps-script')
-                //     ->columnSpanFull(),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Script Face Recognition
-                |--------------------------------------------------------------------------
-                */
-                View::make('filament.forms.face-attendance-script')
-                    ->columnSpanFull(),
-
-                /*
-                |--------------------------------------------------------------------------
-                | Data Verifikasi Wajah
-                |--------------------------------------------------------------------------
-                */
                 Hidden::make('verification_score')
                     ->dehydrated(),
 
@@ -92,6 +65,5 @@ class AttendanceForm
                     ->default(false)
                     ->dehydrated(),
             ]);
-
     }
 }

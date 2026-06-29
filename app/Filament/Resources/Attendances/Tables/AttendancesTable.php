@@ -4,7 +4,9 @@ namespace App\Filament\Resources\Attendances\Tables;
 
 use App\Filament\Exports\AttendanceExporter;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Dom\Text;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -89,6 +91,22 @@ class AttendancesTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                Action::make('downloadSlip')
+                ->icon('heroicon-o-document-arrow-down')
+                ->action(function ($record) {
+
+                    $pdf = Pdf::loadView(
+                        'filament.forms.attendance',
+                        [
+                            'payroll' => $record,
+                        ]
+                    );
+
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'slip-gaji-' . $record->id . '.pdf'
+                    );
+                }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

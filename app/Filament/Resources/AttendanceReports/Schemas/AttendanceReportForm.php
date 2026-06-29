@@ -21,29 +21,35 @@ class AttendanceReportForm
                     ->relationship('user', 'name')
                     ->searchable()
                     ->preload()
-                    ->required(),
+                    ->required()
+                    ->helperText('Pilih pegawai terkait.'),
 
                 DatePicker::make('start_date')
-                    ->required(),
+                    ->required()
+                    ->helperText('Tanggal mulai laporan.'),
 
                 DatePicker::make('end_date')
-                    ->required(),
+                    ->required()
+                    ->helperText('Tanggal akhir laporan.'),
 
                 TextInput::make('total_hours')
                     ->label('Total Working Hours')
                     ->numeric()
                     ->suffix('hrs')
-                    ->required(),
+                    ->required()
+                    ->helperText('Jumlah jam kerja.'),
 
                 TextInput::make('total_overtime')
                     ->label('Total Overtime')
                     ->numeric()
-                    ->suffix('hrs'),
+                    ->suffix('hrs')
+                    ->helperText('Jam lembur tambahan.'),
 
                 TextInput::make('total_late')
                     ->label('Total Late')
                     ->numeric()
-                    ->suffix('hrs'),
+                    ->suffix('hrs')
+                    ->helperText('Jam keterlambatan.'),
 
                 Select::make('status')
                     ->options([
@@ -52,17 +58,20 @@ class AttendanceReportForm
                         'overtime' => 'Overtime',
                         'absent' => 'Absent',
                     ])
-                    ->required(),
+                    ->required()
+                    ->helperText('Status laporan absensi.'),
 
                 DatePicker::make('report_date')
                     ->label('Report Date')
                     ->default(now())
-                    ->required(),
+                    ->required()
+                    ->helperText('Tanggal pembuatan laporan.'),
 
                 Textarea::make('description')
                     ->label('Description')
                     ->rows(4)
-                    ->columnSpanFull(),
+                    ->columnSpanFull()
+                    ->helperText('Catatan singkat.'),
             ])
             ->columns(2);
     }

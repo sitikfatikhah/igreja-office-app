@@ -82,13 +82,6 @@ class PayrollForm
 
                                     $attendanceReport = AttendanceReport::find($state);
 
-                                    //  dd([
-                                    //     'id' => $attendanceReport?->id,
-                                    //     'hours' => $attendanceReport?->total_hours,
-                                    //     'overtime' => $attendanceReport?->total_overtime,
-                                    //     'late' => $attendanceReport?->total_late,
-                                    // ]);
-
                                     if (! $attendanceReport) {
                                         return;
                                     }
@@ -104,35 +97,28 @@ class PayrollForm
                                     $set('total_hours', $attendanceReport->total_hours);
                                     $set('total_overtime', $attendanceReport->total_overtime);
                                     $set('total_late', $attendanceReport->total_late);
-                                }),
+                                })
+                                ->helperText('Select an attendance period.'),
 
                             TextInput::make('gross_pay')
                                 ->numeric()
-                                // ->formatStateUsing(
-                                //     fn ($state) => number_format($state ?? 0, 0, ',', '.')
-                                // )
-                                ->readOnly(),
+                                ->readOnly()
+                                ->helperText('Total gross salary.'),
 
                             TextInput::make('additions')
                                 ->numeric()
-                                // ->formatStateUsing(
-                                //     fn ($state) => number_format($state ?? 0, 0, ',', '.')
-                                // )
-                                ->readOnly(),
+                                ->readOnly()
+                                ->helperText('Additional earnings.'),
 
                             TextInput::make('deductions')
                                 ->numeric()
-                                // ->formatStateUsing(
-                                //     fn ($state) => number_format($state ?? 0, 0, ',', '.')
-                                // )
-                                ->readOnly(),
+                                ->readOnly()
+                                ->helperText('Salary deductions.'),
 
                             TextInput::make('net_pay')
                                 ->numeric()
-                                // ->formatStateUsing(
-                                //     fn ($state) => number_format($state ?? 0, 0, ',', '.')
-                                // )
-                                ->readOnly(),
+                                ->readOnly()
+                                ->helperText('Total net salary.'),
                         ])
                         ->columns(2)
                         ->columnSpanFull(),
@@ -142,15 +128,18 @@ class PayrollForm
                         ->schema([
                             TextInput::make('total_hours')
                                 ->readOnly()
-                                ->live(),
+                                ->live()
+                                ->helperText('Total working hours.'),
 
                             TextInput::make('total_overtime')
                                 ->readOnly()
-                                ->live(),
+                                ->live()
+                                ->helperText('Total overtime hours.'),
 
                             TextInput::make('total_late')
                                 ->readOnly()
-                                ->live(),
+                                ->live()
+                                ->helperText('Total late hours.'),
                         ])
                         ->columns(3),
 
@@ -159,14 +148,17 @@ class PayrollForm
                         ->schema([
                         DateTimePicker::make('generated_at')
                             ->default(now())
-                            ->disabled(),
+                            ->disabled()
+                            ->helperText('Payroll generation date.'),
+
                         Select::make('status')
                             ->options([
                                 'pending' => 'Pending',
                                 'generated' => 'Generated',
                                 'paid' => 'Paid',
                             ])
-                            ->required(),
+                            ->required()
+                            ->helperText('Select the payroll status.'),
                         ])
                         ->columns(2),
                             
