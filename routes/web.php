@@ -15,7 +15,7 @@ Route::get ('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.list');
+    Route::get('/attendances', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/attendances/create', [AttendanceController::class, 'create'])->name('attendances.create');
     Route::get('/attendances/{id}/edit', [AttendanceController::class, 'edit'])->name('attendances.edit');
     Route::get('/attendances/list', [AttendanceController::class, 'index'])->name('attendances.list');
