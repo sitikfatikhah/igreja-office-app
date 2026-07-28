@@ -11,7 +11,7 @@ class AttendancesCluster extends Cluster
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     protected static ?string $slug = 'attendance-management';
 }

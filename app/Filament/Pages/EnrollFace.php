@@ -21,9 +21,9 @@ class EnrollFace extends Page
     
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $title = 'Enroll Face';
+    protected static ?string $title = 'Pendaftaran Wajah';
 
-    protected static ?string $navigationLabel = 'Enroll Face';
+    protected static ?string $navigationLabel = 'Pendaftaran Wajah';
     
 
     public ?string $descriptor = null;
@@ -39,8 +39,8 @@ class EnrollFace extends Page
 
         if (empty($descriptor) || empty($referencePhoto)) {
             Notification::make()
-                ->title('Enroll Failed')
-                ->body('Face descriptor dan reference photo harus tersedia sebelum menyimpan enroll.')
+                ->title('Pendaftaran gagal')
+                ->body('Face descriptor dan reference photo harus tersedia sebelum menyimpan pendaftaran.')
                 ->danger()
                 ->send();
 
@@ -53,8 +53,8 @@ class EnrollFace extends Page
         $user->save();
 
         Notification::make()
-            ->title('Success')
-            ->body('Face data enrolled successfully!')
+            ->title('Berhasil')
+            ->body('Data wajah berhasil disimpan!')
             ->success()
             ->send();
 

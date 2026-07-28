@@ -13,26 +13,26 @@ class CompensationForm
     {
         return $schema
             ->components([
-                Select::make('user_id')
-                    ->relationship('user', 'name')
-                    ->getOptionLabelFromRecordUsing(fn($record)=>"{$record->name}-{$record->nip}")
-                    ->label('Karyawan')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->helperText('Pilih karyawan.'),
+                // Select::make('user_id')
+                //     ->relationship('user', 'name')
+                //     ->getOptionLabelFromRecordUsing(fn($record)=>"{$record->name}-{$record->nip}")
+                //     ->label('Employee')
+                //     ->searchable()
+                //     ->preload()
+                //     ->required()
+                //     ->helperText('Choose Employee.'),
                 TextInput::make('basic_salary')
                     ->label('Basic Salary')
                     ->numeric()
-                    ->helperText('Gaji pokok karyawan.'),
+                    ->helperText('Basic Salary of the Employee.'),
                 DatePicker::make('effective_date')
                     ->label('Effective Date')
                     ->required()
-                    ->helperText('Tanggal berlaku.'),
+                    ->helperText('Effective Date.'),
                 TextInput::make('notes')
                     ->label('Notes')
                     ->nullable()
-                    ->helperText('Catatan singkat.'),
+                    ->helperText('Brief Notes.'),
             ]);
     }
 }

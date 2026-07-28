@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('type');
             $table->integer('amount');
             $table->string('description')->nullable();
+            $table->enum('calculation_type', ['fixed','attendance','overtime',]);
             $table->timestamps();
             $table->softDeletes();
         });

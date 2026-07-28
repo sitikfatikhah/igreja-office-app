@@ -20,7 +20,7 @@ class AttendanceReportExporter extends Exporter
             ExportColumn::make('user.name'),
             ExportColumn::make('start_date'),
             ExportColumn::make('end_date'),
-            ExportColumn::make('total_hours'),
+            ExportColumn::make('total_days'),
             ExportColumn::make('total_late'),
             ExportColumn::make('total_overtime'),
             ExportColumn::make('status'),

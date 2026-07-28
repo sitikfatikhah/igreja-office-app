@@ -157,6 +157,18 @@
             savedDescriptor: @json(auth()->user()->face_descriptor),
         };
     </script>
+    @php
+    $settings = app(\App\Services\SettingsService::class);
+    @endphp
+
+        <script>
+        window.appSettings = {
+            office_latitude: @json($settings->get('attendance.office_latitude')),
+            office_longitude: @json($settings->get('attendance.office_longitude')),
+            radius: @json($settings->get('attendance.radius')),
+        };
+        </script>
+
 
     @vite('resources/js/face-attendance.js')
 @endpush

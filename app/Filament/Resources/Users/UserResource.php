@@ -5,9 +5,17 @@ namespace App\Filament\Resources\Users;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\Pages\ListUsers;
+use App\Filament\Resources\Users\RelationManagers\AllowanceRelationManager;
+use App\Filament\Resources\Users\RelationManagers\AnnualLeaveBalanceRelationManager;
+use App\Filament\Resources\Users\RelationManagers\AttendanceRelationManager;
+use App\Filament\Resources\Users\RelationManagers\CompensationRelationManager;
+use App\Filament\Resources\Users\RelationManagers\EmployeeLoanRelationManager;
+use App\Filament\Resources\Users\RelationManagers\PayrollRelationManager;
+use App\Filament\Resources\Users\RelationManagers\TimeBankRequestRelationManager;
 use App\Filament\Resources\Users\Schemas\UserForm;
 use App\Filament\Resources\Users\Tables\UsersTable;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -33,8 +41,26 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            // CompensationRelationManager::class,
+
+            // AllowanceRelationManager::class,
+
+            EmployeeLoanRelationManager::class,
+
+            AnnualLeaveBalanceRelationManager::class,
+
+            TimeBankRequestRelationManager::class,
+
+            AttendanceRelationManager::class,
+
+            PayrollRelationManager::class,
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['compensation', 'allowance']);
     }
 
     public static function getPages(): array

@@ -10,6 +10,8 @@ use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends BaseDashboard
 {
@@ -19,6 +21,7 @@ class Dashboard extends BaseDashboard
     {
         return [
             FilterAction::make()
+                
                 ->schema([
                     DatePicker::make('startDate'),
                     DatePicker::make('endDate'),

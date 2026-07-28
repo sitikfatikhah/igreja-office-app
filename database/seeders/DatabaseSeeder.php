@@ -25,6 +25,18 @@ class DatabaseSeeder extends Seeder
             'nip' => '123456789',
             'department' => 'IT',
             'position' => 'Manager',
+            'allowance_id' => '2',
+            'compensation_id' => '2',
+        ]);
+        User::factory()->create([
+            'name' => 'Another Test User',
+            'email' => '    ',
+            'password' => bcrypt('password'),
+            'nip' => '987654321',
+            'department' => 'HR',
+            'position' => 'Staff',
+            'allowance_id' => '1',
+            'compensation_id' => '1',
         ]);
     }
 }

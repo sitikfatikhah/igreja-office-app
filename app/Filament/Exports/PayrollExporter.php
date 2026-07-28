@@ -27,7 +27,7 @@ class PayrollExporter extends Exporter
             ExportColumn::make('gross_pay')
                 ->label('Gross Pay'),
             
-            ExportColumn::make('attendanceReport.total_hours')
+            ExportColumn::make('attendanceReport.total_days')
                 ->label('Working Hours'),
 
             ExportColumn::make('attendanceReport.total_overtime')

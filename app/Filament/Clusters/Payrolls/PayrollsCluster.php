@@ -11,5 +11,7 @@ class PayrollsCluster extends Cluster
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    protected static ?string $navigationLabel = 'Employee Payroll';
 }

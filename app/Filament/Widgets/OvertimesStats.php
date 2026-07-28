@@ -2,10 +2,13 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\LeaveRequest;
 use App\Models\Overtimes;
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\Widget;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class OvertimesStats extends Widget
 {
@@ -17,13 +20,33 @@ class OvertimesStats extends Widget
 
     protected string $view = 'filament.widgets.overtimes-stats';
 
+    protected function getUserQuery(Builder $query): Builder
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('super_admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', $user->id);
+    }
+
+    protected function overtimeQuery(): Builder
+    {
+        return $this->getUserQuery(
+            Overtimes::query()
+        );
+    }
+
     public function getViewData(): array
     {
         [$start, $end, $prevStart, $prevEnd] = $this->resolvePeriods();
 
         // overtime_date = tanggal lembur benar-benar terjadi.
-        $currentQuery = fn () => Overtimes::query()->whereBetween('overtime_date', [$start->toDateString(), $end->toDateString()]);
-        $previousQuery = fn () => Overtimes::query()->whereBetween('overtime_date', [$prevStart->toDateString(), $prevEnd->toDateString()]);
+        $currentQuery = fn () =>$this->overtimeQuery()
+            ->whereBetween('overtime_date', [$start->toDateString(), $end->toDateString()]);
+        $previousQuery = fn () => $this->overtimeQuery()
+            ->whereBetween('overtime_date', [$prevStart->toDateString(), $prevEnd->toDateString()]);
 
         $totalRequests = $currentQuery()->count();
         $prevTotalRequests = $previousQuery()->count();

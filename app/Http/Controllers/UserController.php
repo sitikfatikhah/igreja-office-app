@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class UserController extends Controller
 {
@@ -33,9 +34,11 @@ class UserController extends Controller
     }
     public function edit($id)
     {
-        $this->Auth::user()::check()('update', User::class);
+        Gate::authorize('update', User::class);
 
-        DB::table('users')->where('id', $id)->update([
+        $user = User::findOrFail($id);
+
+        $user->update([
             'name' => 'Updated Name',
             'email' => 'updated@example.com',
             'description' => 'Updated description',

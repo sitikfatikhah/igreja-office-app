@@ -19,9 +19,9 @@ class AttendanceTodayWidget extends StatsOverviewWidget
 
         $reportsCount = $todayReports->count();
 
-        $totalHours = (clone $todayReports)->sum('total_hours');
+        $totalDays = (clone $todayReports)->sum('total_present');
 
-        $totalLate = (clone $todayReports)->sum('total_late');
+        $totalLate = (clone $todayReports)->sum('total_absent');
 
         $totalOvertime = (clone $todayReports)->sum('total_overtime');
         return [

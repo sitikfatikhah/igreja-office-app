@@ -11,7 +11,7 @@ class FaceAttendance extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected static ?string $cluster = AttendancesCluster::class;
+    // protected static ?string $cluster = AttendancesCluster::class;
 
     
 }

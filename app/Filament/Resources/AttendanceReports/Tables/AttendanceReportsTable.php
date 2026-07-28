@@ -53,17 +53,20 @@ class AttendanceReportsTable
                 ->label('NIP')
                 ->searchable(),
 
-            TextColumn::make('total_hours')
-                ->label('Working Hours')
-                ->suffix(' hrs')
+            TextColumn::make('total_present')
+                ->label('Total Present')
+                ->suffix(' days')
                 ->sortable(),
 
-            TextColumn::make('total_overtime')
-                ->label('Overtime')
+            TextColumn::make('total_absent')
+                ->label('Total Absent')
                 ->suffix(' hrs'),
 
-            TextColumn::make('total_late')
-                ->label('Late')
+            TextColumn::make('total_overtime')
+                ->label('Total Overtime')
+                ->suffix(' hrs'),
+            TextColumn::make('total_hours')
+                ->label('Total Hours')
                 ->suffix(' hrs'),
 
             TextColumn::make('status')
@@ -92,7 +95,7 @@ class AttendanceReportsTable
             ->deferFilters(false)
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Karyawan')
+                    ->label('Employee')
                     ->relationship('user', 'name')
                     ->preload(),
                     // ->options(

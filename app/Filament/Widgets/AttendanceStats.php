@@ -11,8 +11,8 @@ class AttendanceStats extends StatsOverviewWidget
     protected function getStats(): array
     {
         $totalReports = AttendanceReport::count();
-        $totalHours = AttendanceReport::sum('total_hours');
-        $totalLate = AttendanceReport::sum('total_late');
+        $totalDays = AttendanceReport::sum('total_present');
+        $totalLate = AttendanceReport::sum('total_absent');
         $totalOvertime = AttendanceReport::sum('total_overtime');
 
         return [

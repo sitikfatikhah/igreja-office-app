@@ -19,8 +19,10 @@ return new class extends Migration
         $table->date('end_date');
         $table->decimal('gross_pay', 15, 2)->default(0);
         $table->decimal('net_pay', 15, 2)->default(0);
-        $table->decimal('deductions', 15, 2)->nullable();
-        $table->decimal('additions', 15, 2)->nullable();
+        $table->decimal('deduction_total', 15, 2)->nullable();
+        $table->decimal('addition_total', 15, 2)->nullable();
+        $table->decimal('loan_total', 20, 6)->nullable();
+        $table->integer('overtime_total')->nullable();
         $table->dateTime('generated_at');
         $table->string('status')->default('draft');
         $table->softDeletes();

@@ -2,15 +2,19 @@
 
 namespace App\Models;
 
+use App\Services\AttendanceReportService;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class AttendanceReport extends Model
 {
-    protected $appends = ['attendances_in_period'];
+    protected $appends = ['attendances_in_period', 'total_leave_days'];
+    
+    protected $casts = ['attendances_in_period' => 'array',];
     
     use SoftDeletes;
 
@@ -19,12 +23,14 @@ class AttendanceReport extends Model
         'position',
         'start_date',
         'end_date',
-        'total_hours',
-        'total_late',
+        'total_present',
+        'total_absent',
         'total_overtime',
         'status',
         'report_date',
         'description',
+        'attendances_in_period',
+        'total_hours'
     ];
 
     public function user(): BelongsTo
@@ -40,16 +46,19 @@ class AttendanceReport extends Model
     {
         return $this->hasMany(Attendance::class, 'user_id', 'user_id');
     }
-    public function payroll(): HasMany
+    public function payroll(): HasOne
     {
-        return $this->hasMany(Payrolls::class, 'attendance_report_id');
+        return $this->hasOne(Payrolls::class, 'attendance_report_id');
     }
     public function getAttendancesInPeriodAttribute(): Collection
     {
-        return Attendance::where('user_id', $this->user_id)
-            ->whereBetween('date', [$this->start_date, $this->end_date])
-            ->orderBy('date')
-            ->get();
+        return app(AttendanceReportService::class)->getAttendancesInPeriod($this);
     }
+
+    public function getTotalLeaveDaysAttribute(): int
+    {
+        return app(AttendanceReportService::class)->getTotalLeaveDays($this);
+    }
+    
     
 }

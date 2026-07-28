@@ -5,17 +5,25 @@ namespace App\Filament\Resources\TimeBankRequests\Pages;
 use App\Filament\Resources\TimeBankRequests\TimeBankRequestResource;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
+use Illuminate\Support\Facades\Auth;
 
 class CreateTimeBankRequest extends CreateRecord
 {
     protected static string $resource = TimeBankRequestResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['user_id'] = Auth::id();
+
+        return $data;
+    }
+
     protected function afterCreate(): void
     {
         Notification::make()
             ->success()
-            ->title('Time Bank Request Created')
-            ->body('The time bank request has been created successfully.')
+            ->title('Permintaan Time Bank berhasil dibuat')
+            ->body('Permintaan time bank berhasil dibuat.')
             ->send();
     }
 

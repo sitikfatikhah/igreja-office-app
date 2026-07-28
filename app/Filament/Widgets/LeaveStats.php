@@ -2,10 +2,13 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\LeaveBalances;
 use App\Models\LeaveRequest;
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\Widget;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveStats extends Widget
 {
@@ -17,24 +20,60 @@ class LeaveStats extends Widget
 
     protected string $view = 'filament.widgets.leave-stats';
 
+    protected function getUserQuery(Builder $query): Builder
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('super_admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', $user->id);
+    }
+
+    protected function LeaveQuery(): Builder
+    {
+        return $this->getUserQuery(
+            LeaveRequest::query()
+        );
+    }
+
     public function getViewData(): array
     {
         [$start, $end, $prevStart, $prevEnd] = $this->resolvePeriods();
 
-        $totalRequests = $this->overlapQuery($start, $end)->count();
-        $prevTotalRequests = $this->overlapQuery($prevStart, $prevEnd)->count();
+        $totalRequests = $this->overlapQuery(
+            $this->leaveQuery(),
+            $start,
+            $end
+        )->count();
+        $prevTotalRequests = $this->overlapQuery(
+            $this->leaveQuery(),    
+        $prevStart, $prevEnd)->count();
 
-        $pendingRequests = $this->overlapQuery($start, $end)->where('approval_status', 'pending')->count();
-        $approvedRequests = $this->overlapQuery($start, $end)->where('approval_status', 'approved')->count();
-        $rejectedRequests = $this->overlapQuery($start, $end)->where('approval_status', 'rejected')->count();
+        $pendingRequests = $this->overlapQuery(
+            $this->leaveQuery(),    
+        $start, $end)->where('approval_status', 'pending')->count();
 
-        $totalLeaveDays = (float) $this->overlapQuery($start, $end)->sum('total_days');
+        $approvedRequests = $this->overlapQuery(
+            $this->leaveQuery(),    
+        $start, $end)->where('approval_status', 'approved')->count();
+
+        $rejectedRequests = $this->overlapQuery(
+            $this->leaveQuery(),    
+        $start, $end)->where('approval_status', 'rejected')->count();
+
+        $totalLeaveDays = (float) $this->overlapQuery(
+            $this->leaveQuery(),    
+        $start, $end)->sum('total_days');
 
         $approvalRate = $totalRequests > 0
             ? round(($approvedRequests / $totalRequests) * 100, 1)
             : 0;
 
-        $prevApprovedRequests = $this->overlapQuery($prevStart, $prevEnd)->where('approval_status', 'approved')->count();
+        $prevApprovedRequests = $this->overlapQuery(
+            $this->leaveQuery(),    
+        $prevStart, $prevEnd)->where('approval_status', 'approved')->count();
         $prevApprovalRate = $prevTotalRequests > 0
             ? round(($prevApprovedRequests / $prevTotalRequests) * 100, 1)
             : 0;
@@ -57,9 +96,12 @@ class LeaveStats extends Widget
      * Leave request dianggap "masuk" sebuah rentang ($from-$to) jika periode
      * cuti (start_date..end_date) overlap dengan rentang tersebut.
      */
-    protected function overlapQuery(Carbon $from, Carbon $to)
-    {
-        return LeaveRequest::query()
+    protected function overlapQuery(
+        Builder $query,
+        Carbon $from,
+        Carbon $to
+    ): Builder {
+        return $query
             ->where('start_date', '<=', $to->toDateString())
             ->where('end_date', '>=', $from->toDateString());
     }

@@ -2,19 +2,18 @@
 
 namespace App\Filament\Resources\Payrolls\Pages;
 
+use App\Filament\Exports\PayrollExporter;
 use App\Filament\Resources\Payrolls\PayrollResource;
+use App\Models\PayrollDetail;
 use App\Models\Payrolls;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\EditAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
-use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -35,49 +34,31 @@ class ViewPayroll extends ViewRecord implements HasTable, HasSchemas, HasActions
     {
         return $table
             ->query(
-                Payrolls::query()
-                    ->where('user_id', $this->record->user_id)
-                    ->whereBetween('date', [
-                        $this->record->getRawOriginal('period')
-                    ])
-                    ->orderBy('date')
+                PayrollDetail::query()
+                    ->where('payroll_id', $this->record->id)
+                    ->with('user')
             )
             ->columns([
-                TextColumn::make('user.name')
-                    ->label('Karyawan')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('pay_period')
-                    ->label('Periode')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('base_salary')
-                    ->label('Gaji Pokok')
-                    ->money('IDR', true)
-                    ->sortable(),
-                TextColumn::make('gross_pay')
-                    ->label(Gross)
-                    ->money('IDR', true)
-                    ->sortable(),
-                TextColumn::make('net_pay')
-                    ->label('Net')
-                    ->money('IDR', true)
-                    ->sortable(),
-                TextColumn::make('deductions')
-                    ->label('Pengurangan')
-                    ->money('IDR', true)
-                    ->sortable(),
-                TextColumn::make('additions')
-                    ->label('Penambahan')
-                    ->money('IDR', true)
-                    ->sortable(),
-                TextColumn::make('generated_at')
-                    ->label('Generated_at')
-                    ->dateTime()
-                    ->sortable(),
-                SelectColumn::make('status')
-                    ->label('Status')
+                TextColumn::make('description')
+                    ->label('Description')
                     ->searchable(),
+                TextColumn::make('category')
+                    ->label('Category')
+                    ->sortable(),
+                TextColumn::make('qty')
+                    ->label('Quantity')
+                    ->sortable(),
+                TextColumn::make('rate')
+                    ->label('Rate')
+                    ->money('IDR', true)
+                    ->sortable(),
+                TextColumn::make('amount')
+                    ->label('Amount')
+                    ->money('IDR', true)
+                    ->sortable(),
+                TextColumn::make('user.name')
+                    ->label('Employee')
+                    ->sortable(),
             ])
             ->paginated(false)
             ->striped();
@@ -87,21 +68,6 @@ class ViewPayroll extends ViewRecord implements HasTable, HasSchemas, HasActions
     {
         return [
             EditAction::make(),
-
-            ExportAction::make('exportDetail')
-                ->label('ExportDetail')
-                ->icon('heroicon-o-arrow-down-tray')
-                ->exporter(PayrollExporter::class)
-                ->formats([ExportFormat::csv, ExportFormat::Xlsx])
-                ->modifyQueryUsing(function ($query){
-                    $record = $this->getRecord();
-
-                    return $query
-                        ->where('user_id', $record->user_id)
-                        ->where('pay_period')
-                        ->orderBy('date');
-                }),
-
         ];
     }
 
@@ -113,8 +79,8 @@ class ViewPayroll extends ViewRecord implements HasTable, HasSchemas, HasActions
                 Section::make('Payroll Summary')
                     ->columns(3)
                     ->schema([
-                        TextEntry::make('user.name')->label('Karyawan'),
-                        TextEntry::make(user.nip)->label('NIP'),
+                        TextEntry::make('user.name')->label('Employee Name'),
+                        TextEntry::make('user.nip')->label('NIP'),
                         TextEntry::make('status')
                             ->badge()
                             ->color(fn(string $state) => match ($state){
@@ -124,14 +90,14 @@ class ViewPayroll extends ViewRecord implements HasTable, HasSchemas, HasActions
                                 'absent'   => 'gray',
                                 default    => 'gray',
                             }),
-                        TextEntry::make('pay_period')->label('Periode'),
-                        TextEntry::make('base_salary')->label('Gaji Pokok'),
-                        TextEntry::make('gross_pay')->label(Gross),
-                        TextEntry::make('net_pay')->label('Net'),
-                        TextEntry::make('additions')->label('Penambahan'),
-                        TextEntry::make('overtime_hours')->label('pengurangan'),
-                        TextEntry::make('overtime_pay')->label('Lembur'),
-                        TextEntry::make('allowance')->label('allowance'),
+                        TextEntry::make('pay_period')->label('Period'),
+                        TextEntry::make('base_salary')->label('Base Salary'),
+                        TextEntry::make('gross_pay')->label('Gross Pay'),
+                        TextEntry::make('net_pay')->label('Net Pay'),
+                        TextEntry::make('additions')->label('Additions'),
+                        TextEntry::make('overtime_hours')->label('Overtime Hours'),
+                        TextEntry::make('overtime_pay')->label('Overtime Pay'),
+                        TextEntry::make('allowance')->label('Allowance'),
                         TextEntry::make('status'),
                         TextEntry::make('generated_at'),
 

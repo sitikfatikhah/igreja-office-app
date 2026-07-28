@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Allowance extends Model
 {
@@ -10,10 +11,11 @@ class Allowance extends Model
         'type',
         'amount',
         'description',
+        'calculation_type'
     ];
 
-    public function user()
+    public function users(): BelongsToMany
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsToMany(User::class, 'allowance_id');
     }
 }

@@ -43,11 +43,11 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandLogo(fn () => app(SettingsService::class)->getCompanyLogo(auth()->user()))
+            ->brandLogo(fn () => app(SettingsService::class)->getCompanyLogo())
             ->brandLogoHeight('4rem')
-           ->colors([
-                'primary' => Color::hex('#3B82F6'), // Blue-500
-                'gray' => Color::Slate,
+            ->colors([
+                    'primary' => Color::hex('#3B82F6'), // Blue-500
+                    'gray' => Color::Slate,
             ])
             ->databaseNotifications()
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
@@ -59,34 +59,10 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
                 
-                // AccountWidget::class,
-                // FilamentInfoWidget::class,
-
-                // Executive
-                // OverviewStats::class,
-
-                // Action Center
-                // PendingApprovalWidget::class,
-
-                // Core HR
-                // AttendanceStats::class,
                 LeaveStats::class,
                 OvertimesStats::class,
-                // PayrollStats::class,
-
-                // Monitoring
-                // AttendanceTrendChart::class,
-                // LeaveRequestChart::class,
-
-                // Admin Monitoring
-                // AttendanceTodayWidget::class,
                 PayrollStatusWidget::class,
-                // AttendanceReportStatusWidget::class,
-
-                // Activity
-                // RecentActivitiesWidget::class,
             ])
-            ->pages([Dashboard::class,])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

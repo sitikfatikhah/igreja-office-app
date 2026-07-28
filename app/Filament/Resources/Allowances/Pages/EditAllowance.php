@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Allowances\Pages;
 use App\Filament\Resources\Allowances\AllowanceResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
+use Override;
 
 class EditAllowance extends EditRecord
 {
@@ -15,5 +16,11 @@ class EditAllowance extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    
+    protected function getRedirectUrl(): ?string
+    {
+        return $this->getResource()::getUrl('index');
     }
 }

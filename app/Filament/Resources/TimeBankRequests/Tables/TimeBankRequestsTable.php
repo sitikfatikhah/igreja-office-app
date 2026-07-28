@@ -17,12 +17,23 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class TimeBankRequestsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function(Builder $query){
+                $user = Auth::user();
+
+                if ($user->hasRole('super_admin')){
+                    return $query;
+                }
+
+                return $query->where('user_id', $user->id);
+            })
             ->columns([
                 TextColumn::make('id')->label('ID')->sortable(),
                 TextColumn::make('user.name')->label('User Name')->sortable()->searchable(),
@@ -63,30 +74,34 @@ class TimeBankRequestsTable
             ])
             ->recordActions([
                 EditAction::make(),
-                Action::make('approve')
-                ->label('Approve')
+                Action::make('approved')
+                ->label('Approved')
+                ->disabled(fn () =>
+                    auth()->user()->hasRole('user')
+                )
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
+                ->requiresConfirmation()
                 ->action(function($record)
                 {
                     $record->update([
-                        'approval_status' => 'approve',
+                        'approval_status' => 'approved',
                         'approved_by' => auth()->id(),
                     ]);
 
-                    $lastBalance =LeaveDepositBalance::where(
+                    $lastBalance = LeaveDepositBalance::where(
                         'user_id',
                         $record->user_id
                     )
                     ->latest('id')
-                    ->value('balance') ?? 0;
+                    ->value('balanced') ?? 0;
 
                     LeaveDepositBalance::create([
-                        'user-id' => $record->user_id,
-                        'time_bank_request_id' => $record_id,
+                        'user_id' => $record->user_id,
+                        'time_bank_request_id' => $record->id,
                         'days' => 1,
                         'type' => 'credit',
-                        'balance' =>$lastBalance +1,
+                        'balanced' =>$lastBalance +1,
                         'description'=> 'Approved'
                     ]);
 
@@ -97,13 +112,17 @@ class TimeBankRequestsTable
                     Notification::make()
                         ->success()
                         ->title('Request Approved')
-                        ->body('Deposit Cuti berhasil ditambahkan')
+                        ->body('Deposit leave request has been approved successfully.')
                         ->send();
                 }),
                 Action::make('reject')
                     ->label('Reject')
+                     ->disabled(fn () =>
+                        auth()->user()->hasRole('user')
+                    )
                     ->icon('heroicon-o-x-circle')
                     ->color('danger')
+                    ->requiresConfirmation()
                     ->action(function($record)
                     {
                         $record->update([
@@ -114,6 +133,7 @@ class TimeBankRequestsTable
                         Notification::make()
                             ->danger()
                             ->title('Request Rejected')
+                            ->body('Deposit leave request has been rejected.')
                             ->send();
                                 }),
 

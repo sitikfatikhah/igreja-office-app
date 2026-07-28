@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('leave_deposit_balances', function (Blueprint $table) {
+        Schema::create('employee_work_schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id');
-            $table->foreignId('time_bank_request_id');
-            $table->integer('days');
-            $table->string('type');
-            $table->integer('balanced');
-            $table->string('description');
+            $table->bigInteger('user_id')->cascade()->onDelete();
+            $table->date('effective_from');
+            $table->date('effective_untill');
+            $table->json('off_days');
+            $table->string('remarks')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('leave_deposit_balances');
+        Schema::dropIfExists('employee_work_schedules');
     }
 };

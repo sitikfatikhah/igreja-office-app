@@ -19,8 +19,8 @@ return new class extends Migration
             $table->time('start_time');
             $table->time('end_time');
             $table->decimal('total_hours', 5, 2);
-            $table->decimal('base_pay', 5,2);
-            $table->decimal('total_pay', 5,2);            
+            $table->decimal('base_pay', 15,2);
+            $table->decimal('total_pay', 15,2);            
             $table->string('description')->nullable();
             $table->string('approval_status')->default('pending');
             $table->string('approved_by')->nullable();

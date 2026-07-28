@@ -55,16 +55,33 @@ class UserForm
                     ])
                     ->required()
                     ->helperText('Select the employee\'s department.'),
+                
+                
+                Select::make('compensation_id')
+                    ->relationship('compensation', 'basic_salary')
+                    ->label('Compensation')
+                    ->preload()
+                    ->searchable()
+                    ->helperText('Employee Compensation'),
 
                 TextInput::make('password')
                     ->password()
                     ->required()
+                    ->revealable()
                     ->helperText('Create a secure password.'),
+                CheckboxList::make('allowance')
+                    ->relationship('allowance', 'type')
+                    ->label('Allowance')
+                    ->searchable()
+                    ->helperText('Select one or more Allowance'),
 
-CheckboxList::make('roles')
-    ->relationship('roles', 'name')
-    ->searchable()
-    ->helperText('Select one or more roles.'),
+                CheckboxList::make('roles')
+                    ->relationship('roles', 'name')
+                    ->searchable()
+                    ->helperText('Select one or more roles.'),
+
+                
+                
             ]);
     }
 }

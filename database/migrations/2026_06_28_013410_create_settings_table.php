@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('settings', function (Blueprint $table) {
             $table->id();
-            $table->string('key')->unique();
+            $table->string('key');
             $table->json('value')->nullable();
             $table->string('type')->default('string');
             $table->string('group')->nullable();
@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('permission')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
+            $table->unique(
+            ['key', 'group', 'scope', 'role', 'permission'],
+            'settings_scope_unique'
+        );
         });
     }
 

@@ -25,6 +25,8 @@ class AllowancesTable
                     ->sortable(),
                 TextColumn::make('description')
                     ->searchable(),
+                TextColumn::make('calculation_type')
+                    ->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),

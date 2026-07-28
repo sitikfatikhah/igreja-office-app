@@ -14,12 +14,14 @@ return new class extends Migration
         Schema::create('leave_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->string('leave_type');
+            $table->string('leave_type')->nullable();
             $table->date('start_date');
             $table->date('end_date');
             $table->integer('total_days');
             $table->string('reason');
             $table->string('approval_status')->default('pending');
+            $table->enum('source', ['annual_leave', 'time_bank'])->default('annual_leave');
+            // $table->foreignId('leave_deposit_balance_id')->nullable()->constrained()->cascadeOnUpdate()->cascadeOnDelete();
             $table->timestamps();
         });
     }

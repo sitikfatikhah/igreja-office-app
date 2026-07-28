@@ -11,5 +11,7 @@ class LeaveDepositsCluster extends Cluster
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::InboxArrowDown;
 
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::End;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    protected static ?string $navigationLabel = 'Employee Leave';
 }

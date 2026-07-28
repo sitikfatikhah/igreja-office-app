@@ -277,6 +277,22 @@ window.initFaceAttendance = async function () {
         return { verified, score: distance };
     }
 
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371000; // meter
+
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) *
+            Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) *
+            Math.sin(dLon / 2);
+
+        return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+    }
+
     /**
      * Mengirim semua data (GPS + hasil verifikasi wajah) ke server dalam
      * SATU panggilan method Livewire (submitAttendance), bukan dengan
@@ -344,6 +360,17 @@ window.initFaceAttendance = async function () {
             setStatus('Mengambil lokasi GPS...', 'progress');
             const gps = await getGps();
             setStatus(`Lokasi diperoleh: ${gps.location_name}`, 'progress');
+
+            const officelat = Number(window.appSettings.office_latitude);
+            const officelng = Number(window.appSettings.office_longitude);
+            const radius = Number(window.appSettings.radius);
+
+            const distance = calculateDistance(gps.latitude, gps.longitude, officelat, officelng);
+            if (distance > radius) {
+                throw new Error(
+                    `Lokasi Anda berada ${Math.round(distance)} meter dari kantor. Maksimal radius absensi adalah ${radius} meter.`
+                );
+            }
 
             setStatus('Memverifikasi wajah...', 'progress');
             const faceResult = await matchFace(video);

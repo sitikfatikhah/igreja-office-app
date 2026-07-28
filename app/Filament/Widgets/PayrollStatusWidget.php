@@ -6,6 +6,8 @@ use App\Models\Payrolls;
 use Carbon\Carbon;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Filament\Widgets\Widget;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class PayrollStatusWidget extends Widget
 {
@@ -17,31 +19,96 @@ class PayrollStatusWidget extends Widget
 
     protected string $view = 'filament.widgets.payroll-status-widget';
 
+    protected function getUserQuery(Builder $query): Builder
+    {
+        $user = Auth::user();
+
+        if ($user->hasRole('super_admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', $user->id);
+    }
+
+    protected function payrollQuery(): Builder
+    {
+        return $this->getUserQuery(
+            Payrolls::query()
+        );
+    }
+
     public function getViewData(): array
     {
         [$start, $end, $prevStart, $prevEnd] = $this->resolvePeriods();
 
-        $draft = $this->overlapQuery($start, $end)->where('status', 'draft')->count();
-        $generated = $this->overlapQuery($start, $end)->where('status', 'generated')->count();
-        $paid = $this->overlapQuery($start, $end)->where('status', 'paid')->count();
+        $draft = $this->overlapQuery(
+            $this->payrollQuery(),
+            $start,
+            $end
+        )
+        ->where('status', 'draft')
+        ->count();
 
-        $payrollValue = (float) $this->overlapQuery($start, $end)->where('status', 'paid')->sum('net_pay');
-        $prevPayrollValue = (float) $this->overlapQuery($prevStart, $prevEnd)->where('status', 'paid')->sum('net_pay');
+        $generated = $this->overlapQuery(
+            $this->payrollQuery(),
+            $start,
+            $end
+        )
+        ->where('status', 'generated')
+        ->count();
+
+        $paid = $this->overlapQuery(
+            $this->payrollQuery(),
+            $start,
+            $end
+        )
+        ->where('status', 'paid')
+        ->count();
+
+        $payrollValue = (float) $this->overlapQuery(
+            $this->payrollQuery(),
+            $start,
+            $end
+        )
+        ->where('status', 'paid')
+        ->sum('net_pay');
+
+        $prevPayrollValue = (float) $this->overlapQuery(
+            $this->payrollQuery(),
+            $prevStart,
+            $prevEnd
+        )
+        ->where('status', 'paid')
+        ->sum('net_pay');
 
         $totalPayrolls = $draft + $generated + $paid;
-        $paidRate = $totalPayrolls > 0 ? round(($paid / $totalPayrolls) * 100, 1) : 0;
+
+        $paidRate = $totalPayrolls > 0
+            ? round(($paid / $totalPayrolls) * 100, 1)
+            : 0;
 
         return [
             'paidRate' => $paidRate,
             'payrollValueTrend' => $this->trendLabel($payrollValue, $prevPayrollValue),
+
             'draft' => $draft,
             'generated' => $generated,
             'paid' => $paid,
+
             'totalPayrolls' => $totalPayrolls,
             'payrollValue' => $payrollValue,
-            'draftPercent' => $totalPayrolls > 0 ? round(($draft / $totalPayrolls) * 100, 1) : 0,
-            'generatedPercent' => $totalPayrolls > 0 ? round(($generated / $totalPayrolls) * 100, 1) : 0,
-            'paidPercent' => $totalPayrolls > 0 ? round(($paid / $totalPayrolls) * 100, 1) : 0,
+
+            'draftPercent' => $totalPayrolls > 0
+                ? round(($draft / $totalPayrolls) * 100, 1)
+                : 0,
+
+            'generatedPercent' => $totalPayrolls > 0
+                ? round(($generated / $totalPayrolls) * 100, 1)
+                : 0,
+
+            'paidPercent' => $totalPayrolls > 0
+                ? round(($paid / $totalPayrolls) * 100, 1)
+                : 0,
         ];
     }
 
@@ -49,9 +116,12 @@ class PayrollStatusWidget extends Widget
      * Payroll dianggap "masuk" sebuah rentang ($from-$to) jika periode kerja
      * payroll (start_date..end_date) overlap dengan rentang tersebut.
      */
-    protected function overlapQuery(Carbon $from, Carbon $to)
-    {
-        return Payrolls::query()
+    protected function overlapQuery(
+        Builder $query,
+        Carbon $from,
+        Carbon $to
+    ): Builder {
+        return $query
             ->where('start_date', '<=', $to->toDateString())
             ->where('end_date', '>=', $from->toDateString());
     }

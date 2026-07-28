@@ -12,18 +12,21 @@ class LeaveDepositBalance extends Model
         'time_bank_request_id',
         'days',
         'type',
-        'balance',
+        'balanced',
         'description'
     ];
 
     public function user(): BelongsTo
     {
-        return $this->BelongsTo(User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function timeBankRequest(): BelongsTo
     {
         return $this->belongsTo(TimeBankRequest::class, 'time_bank_request_id');
     }
-
+    public function leaveRequest(): BelongsTo
+    {
+        return $this->belongsTo(LeaveRequest::class);
+    }
 }

@@ -19,18 +19,27 @@ class TimeBankRequestForm
             ->components([
                 Select::make('user_id')
                     ->label('User ID')
-                    ->options(fn () =>User::pluck('name', 'id'))
+                    ->options(fn () => User::pluck('name', 'id'))
                     ->live()
-                    ->afterStateUpdated(function(Get $get, Set $set){
+                    ->afterStateUpdated(function (Get $get, Set $set) {
                         $userId = $get('user_id');
                         $user = User::find($userId);
                         $set('position', $user?->position);
                     })
                     ->required()
+                    ->default(function () {
+                        return auth()->user()->id;
+                    })
+                    ->disabled(fn () => auth()->user()->hasRole('user'))
                     ->helperText('Pilih pegawai.'),
                 TextInput::make('position')
                     ->label('Jabatan')
-                    ->disabled()
+                    ->default(function (Get $get) {
+                        $userId = $get('user_id');
+                        $user = User::find($userId);
+                        return $user?->position;
+                    })
+                    ->disabled(fn () => auth()->user()->hasRole('user'))
                     ->dehydrated()
                     ->required()
                     ->helperText('Jabatan pegawai.'),
@@ -46,7 +55,7 @@ class TimeBankRequestForm
                 Select::make('approval_status')
                     ->label('Approval Status')
                     ->default('Pending')
-                    ->disabled(fn() =>auth()->user()->hasRole('user'))
+                    ->disabled(fn () => auth()->user()->hasRole('user'))
                     ->options([
                         'Pending' => 'Pending',
                         'Approved' => 'Approved',
@@ -56,11 +65,12 @@ class TimeBankRequestForm
                     ->helperText('Status persetujuan.'),
                 Select::make('approved_by')
                     ->label('Approved By')
-                    ->options(fn () =>User::pluck('name', 'id'))
-                    ->live()
-                    ->default('pending')
-                    ->disabled(fn() =>auth()->user()->hasRole('user'))
-                    ->helperText('Disetujui oleh.'), // Disable for regular users
+                    ->relationship('approvedBy', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->disabled(fn () => auth()->user()->hasRole('user'))
+                    ->dehydrated()
+                    ->helperText('approved By.')
             ]);
     }
 }

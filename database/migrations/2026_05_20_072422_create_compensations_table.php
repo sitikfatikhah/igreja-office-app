@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('compensations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->integer('basic_salary');
             $table->dateTime('effective_date');
             $table->boolean('is_active')->default(true);

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\AttendanceReports\Schemas;
 
-use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -22,36 +21,39 @@ class AttendanceReportForm
                     ->searchable()
                     ->preload()
                     ->required()
-                    ->helperText('Pilih pegawai terkait.'),
+                    ->helperText('Select the employee.'),
 
                 DatePicker::make('start_date')
+                    ->label('Start Date')
                     ->required()
-                    ->helperText('Tanggal mulai laporan.'),
+                    ->helperText('Select the report start date.'),
 
                 DatePicker::make('end_date')
+                    ->label('End Date')
                     ->required()
-                    ->helperText('Tanggal akhir laporan.'),
+                    ->helperText('Select the report end date.'),
 
-                TextInput::make('total_hours')
-                    ->label('Total Working Hours')
+                TextInput::make('total_days')
+                    ->label('Total Working Days')
                     ->numeric()
-                    ->suffix('hrs')
+                    ->suffix('days')
                     ->required()
-                    ->helperText('Jumlah jam kerja.'),
+                    ->helperText('Total number of working days.'),
 
                 TextInput::make('total_overtime')
                     ->label('Total Overtime')
                     ->numeric()
-                    ->suffix('hrs')
-                    ->helperText('Jam lembur tambahan.'),
+                    ->suffix('hours')
+                    ->helperText('Total overtime hours worked.'),
 
                 TextInput::make('total_late')
-                    ->label('Total Late')
+                    ->label('Total Late Days')
                     ->numeric()
-                    ->suffix('hrs')
-                    ->helperText('Jam keterlambatan.'),
+                    ->suffix('days')
+                    ->helperText('Total number of late attendance days.'),
 
                 Select::make('status')
+                    ->label('Status')
                     ->options([
                         'present' => 'Present',
                         'late' => 'Late',
@@ -59,19 +61,19 @@ class AttendanceReportForm
                         'absent' => 'Absent',
                     ])
                     ->required()
-                    ->helperText('Status laporan absensi.'),
+                    ->helperText('Select the attendance status.'),
 
                 DatePicker::make('report_date')
                     ->label('Report Date')
                     ->default(now())
                     ->required()
-                    ->helperText('Tanggal pembuatan laporan.'),
+                    ->helperText('Date when the report was generated.'),
 
                 Textarea::make('description')
                     ->label('Description')
                     ->rows(4)
                     ->columnSpanFull()
-                    ->helperText('Catatan singkat.'),
+                    ->helperText('Enter additional notes or remarks.'),
             ])
             ->columns(2);
     }

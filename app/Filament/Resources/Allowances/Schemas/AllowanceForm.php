@@ -27,6 +27,15 @@ class AllowanceForm
                     ->label('Description')
                     ->columnSpanFull()
                     ->helperText('Enter a brief description.'),
+                Select::make('calculation_type')
+                    ->options([
+                        'fixed'=> 'Fixed',
+                        'attendance' => 'Attendance', 
+                        'overtime' => 'Overtime',
+                        ])
+                    ->required()
+                    ->columnSpanFull()
+                    ->helperText('Select Calculation Type.'),
             ]);
     }
 }

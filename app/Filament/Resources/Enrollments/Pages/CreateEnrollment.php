@@ -8,7 +8,7 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateEnrollment extends CreateRecord
 {
-    protected static string $resource = EnrollmentResource::class;
+    // protected static string $resource = EnrollmentResource::class;
 
     /**
      * Sembunyikan tombol bawaan Filament (Create, Create & create another,
@@ -43,27 +43,27 @@ class CreateEnrollment extends CreateRecord
      * pendekatan lama yang memakai endpoint API tersendiri (fetch() +
      * CSRF token manual ke EnrollFaceController).
      */
-    public function submitEnrollment(
-        string $descriptor,
-        string $referencePhoto,
-    ): void {
-        $user = auth()->user();
+    // public function submitEnrollment(
+    //     string $descriptor,
+    //     string $referencePhoto,
+    // ): void {
+    //     $user = auth()->user();
 
-        logger()->info('SUBMIT ENROLLMENT CALLED', [
-            'user_id' => $user->id,
-            'descriptor_length' => strlen($descriptor),
-            'reference_photo_length' => strlen($referencePhoto),
-        ]);
+    //     logger()->info('SUBMIT ENROLLMENT CALLED', [
+    //         'user_id' => $user->id,
+    //         'descriptor_length' => strlen($descriptor),
+    //         'reference_photo_length' => strlen($referencePhoto),
+    //     ]);
 
-        $user->face_descriptor = $descriptor;
-        $user->reference_photo = $referencePhoto;
-        $user->save();
+    //     $user->face_descriptor = $descriptor;
+    //     $user->reference_photo = $referencePhoto;
+    //     $user->save();
 
-        Notification::make()
-            ->title('Face enrollment berhasil disimpan.')
-            ->success()
-            ->send();
+    //     Notification::make()
+    //         ->title('Face enrollment berhasil disimpan.')
+    //         ->success()
+    //         ->send();
 
-        $this->redirect(EnrollmentResource::getUrl('index'));
-    }
+    //     $this->redirect(EnrollmentResource::getUrl('index'));
+    // }
 }

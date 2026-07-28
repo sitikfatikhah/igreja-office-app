@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Attendances\Pages;
 use App\Filament\Clusters\Attendances\AttendancesCluster;
 use App\Filament\Resources\Attendances\AttendanceResource;
 use App\Models\Attendance;
+use App\Services\AttendanceService;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
 
@@ -114,15 +115,7 @@ class CreateAttendance extends CreateRecord
     {
         logger()->info('FORM DATA', $data);
 
-        $latitude = isset($data['latitude']) && $data['latitude'] !== '' && is_numeric($data['latitude'])
-            ? (float) $data['latitude']
-            : null;
-
-        $longitude = isset($data['longitude']) && $data['longitude'] !== '' && is_numeric($data['longitude'])
-            ? (float) $data['longitude']
-            : null;
-
-        $locationName = $data['location_name'] ?? null;
+        [$latitude, $longitude, $locationName] = app(AttendanceService::class)->parseCoordinates($data);
 
         logger()->warning('FINAL GPS CHECK', [
             'raw_lat' => $data['latitude'] ?? null,
@@ -138,7 +131,6 @@ class CreateAttendance extends CreateRecord
         ]);
 
         if (! is_numeric($latitude) || ! is_numeric($longitude)) {
-
             Notification::make()
                 ->title('GPS belum ditemukan')
                 ->body('Mohon tunggu hingga lokasi berhasil diperoleh.')
@@ -152,10 +144,9 @@ class CreateAttendance extends CreateRecord
 
         $user = auth()->user();
 
-        $attendanceToday = Attendance::query()
-            ->where('user_id', $user->id)
-            ->whereDate('date', today())
-            ->first();
+        $attendanceService = app(AttendanceService::class);
+
+        $attendanceToday = $attendanceService->getAttendanceToday($user);
 
         // CHECK OUT
         if ($attendanceToday) {
@@ -172,7 +163,7 @@ class CreateAttendance extends CreateRecord
                 return [];
             }
 
-            if (! $this->isCheckInLocationAllowed(
+            if (! $attendanceService->isCheckInLocationAllowed(
                 $latitude,
                 $longitude
             )) {
@@ -188,12 +179,7 @@ class CreateAttendance extends CreateRecord
                 return [];
             }
 
-            $attendanceToday->update([
-                'check_out' => now(),
-                'check_out_latitude' => $latitude,
-                'check_out_longitude' => $longitude,
-                'check_out_location_name' => $locationName,
-            ]);
+            $attendanceService->handleCheckOut($attendanceToday, $latitude, $longitude, $locationName);
 
             Notification::make()
                 ->title('Check-out berhasil')
@@ -205,13 +191,7 @@ class CreateAttendance extends CreateRecord
         }
 
         // CHECK IN
-        $data['user_id'] = $user->id;
-        $data['date'] = today();
-        $data['check_in'] = now();
-        $data['nip'] = $user->nip;
-        $data['position'] = $user->position;
-
-        if (! $this->isCheckInLocationAllowed(
+        if (! $attendanceService->isCheckInLocationAllowed(
             $latitude,
             $longitude
         )) {
@@ -227,9 +207,7 @@ class CreateAttendance extends CreateRecord
             return [];
         }
 
-        $data['check_in_latitude'] = $latitude;
-        $data['check_in_longitude'] = $longitude;
-        $data['check_in_location_name'] = $locationName;
+        $data = $attendanceService->prepareCheckInData($user, $latitude, $longitude, $locationName, $data);
 
         unset(
             $data['latitude'],

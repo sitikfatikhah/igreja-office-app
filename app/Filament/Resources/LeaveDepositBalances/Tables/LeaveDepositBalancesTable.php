@@ -10,12 +10,23 @@ use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class LeaveDepositBalancesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function(Builder $query){
+                $user = Auth::user();
+
+                if ($user->hasRole('super_admin')){
+                    return $query;
+                }
+
+                return $query->where('user_id', $user->id);
+            })
             ->columns([
                 TextColumn::make('id'),
                 TextColumn::make('user.name'),
@@ -28,8 +39,8 @@ class LeaveDepositBalancesTable
                 TextColumn::make('type')
                     ->label('Type')
                     ->searchable(),
-                TextColumn::make('balance')
-                    ->label('Balance')
+                TextColumn::make('balanced')
+                    ->label('Balanced')
                     ->searchable(),
                 TextColumn::make('description')
                     ->label('Description')              
@@ -37,7 +48,7 @@ class LeaveDepositBalancesTable
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Karyawan')
+                    ->label('Employee')
             ])
             ->recordActions([
                 EditAction::make(),

@@ -4,6 +4,8 @@ namespace App\Filament\Resources\AttendanceReports\Pages;
 
 use App\Filament\Resources\AttendanceReports\AttendanceReportResource;
 use App\Models\Attendance;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\DB;
 
@@ -13,26 +15,30 @@ class CreateAttendanceReport extends CreateRecord
 
     public function getReportData()
     {
-        $data= $this->form->getState();
-        
-        $query = Attendance::query()
-            ->select([
-                'user_id',
-                DB::raw('DATE(date) as date'),
-                DB::raw('DATE(start_date) as start date'),
-                DB::raw('DATE(end_date) as end date'),
-            ]);
-            
-            if(!empty($data['user-id'])){
-                $query->where('user_id', $data['user_id']);
-            }
+        $data = $this->form->getState();
 
-            if(!empty($data['month'])){
-                $query->whereRaw(
-                    "DATE-FORMAT(date, '%Y-%m')= ?",
-                    [$data['month']]
-                );
-            }
-            return $query->with('user')->get();
-            }
+        $query = Attendance::query()
+            ->with('user')
+            ->orderBy('date');
+
+        if (! empty($data['user_id'])) {
+            $query->where('user_id', $data['user_id']);
+        }
+
+        if (! empty($data['start_date'])) {
+            $query->whereDate('date', '>=', $data['start_date']);
+        }
+
+        if (! empty($data['end_date'])) {
+            $query->whereDate('date', '<=', $data['end_date']);
+        }
+
+        if (! empty($data['month'])) {
+            $month = Carbon::parse($data['month']);
+            $query->whereYear('date', $month->year)
+                ->whereMonth('date', $month->month);
+        }
+
+        return $query->get();
+    }
 }

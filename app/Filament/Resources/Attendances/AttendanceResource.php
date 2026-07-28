@@ -16,6 +16,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class AttendanceResource extends Resource
 {
@@ -42,18 +43,39 @@ class AttendanceResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
+    }
+
+    public static function canAccess(): bool
+    {
+        return true;
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => ListAttendances::route('/'),
+            'index'  => ListAttendances::route('/'),
             'create' => CreateAttendance::route('/create'),
-            'view' => ViewAttendance::route('/{record}'),
-            'edit' => EditAttendance::route('/{record}/edit'),
+            'view'   => ViewAttendance::route('/{record}'),
+            'edit'   => EditAttendance::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Batasi data yang dapat dilihat berdasarkan role.
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+
+        // Super Admin dan Admin dapat melihat semua data
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return $query;
+        }
+
+        // User hanya melihat data miliknya sendiri
+        return $query->where('user_id', $user->id);
     }
 }

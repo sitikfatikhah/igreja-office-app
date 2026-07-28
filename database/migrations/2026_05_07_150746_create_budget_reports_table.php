@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('budget_reports', function (Blueprint $table) {
             $table->id();
             $table->foreignId('payroll_id')->constrained('payrolls')->onDelete('cascade');
-            $table->decimal('total_salary_paid', 10, 2);
-            $table->decimal('total_overtime_paid', 10, 2);
-            $table->decimal('total_deductions', 10, 2);
-            $table->decimal('total_budget_used', 10, 2);
+            $table->decimal('total_salary_paid', 15, 2);
+            $table->decimal('total_overtime_paid', 15, 2);
+            $table->decimal('total_deductions', 15, 2);
+            $table->decimal('total_budget_used', 15, 2);
             $table->softDeletes();
             $table->timestamps();
         });

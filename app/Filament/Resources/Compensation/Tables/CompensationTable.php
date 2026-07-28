@@ -22,8 +22,6 @@ class CompensationTable
             ->paginationMode(PaginationMode::Simple)
             ->striped()
             ->columns([
-                TextColumn::make('user_id')
-                    ->label('Karyawan'),
                 TextColumn::make('basic_salary')
                     ->label('Basic Salary')
                     ->money('idr', true),

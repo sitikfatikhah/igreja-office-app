@@ -6,6 +6,9 @@ use App\Filament\Exports\AttendanceDetailExporter;
 use App\Filament\Resources\AttendanceReports\AttendanceReportResource;
 use App\Models\Attendance;
 use App\Models\AttendanceReport;
+use App\Models\EmployeeWorkSchedule;
+use App\Models\LeaveRequest;
+use App\Services\AttendanceReportService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Filament\Actions\Action;
@@ -24,6 +27,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, HasActions
 {
@@ -36,9 +40,41 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
 
     protected string $view = 'filament.pages.view-attendance-report';
 
-    public function mount(int | string $record): void
+    protected Collection $workSchedules;
+    
+    
+    public function mount($record): void
     {
         parent::mount($record);
+
+        $this->workSchedules = EmployeeWorkSchedule::where(
+            'user_id',
+            $this->record->user_id
+        )
+        ->orderBy('effective_from')
+        ->get();
+    }
+
+    /**
+     * Approved leave requests overlapping the report's period.
+     * Reused by both the infolist (indirectly, via the model accessor)
+     * and the PDF export below.
+     */
+    protected function getApprovedLeaveRequests(AttendanceReport $record)
+    {
+        return LeaveRequest::query()
+            ->where('user_id', $record->user_id)
+            ->where('approval_status', 'Approved')
+            ->whereDate('start_date', '<=', $record->getRawOriginal('end_date'))
+            ->whereDate('end_date', '>=', $record->getRawOriginal('start_date'))
+            ->get();
+    }
+    protected function getOffDays(AttendanceReport $record)
+    {
+        return EmployeeWorkSchedule::query()
+            ->where('user_id', $record->user_id)
+            ->latest('effective_from')
+            ->get();
     }
 
     public function table(Table $table): Table
@@ -66,9 +102,9 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                     ->label('Check Out')
                     ->dateTime('H:i')
                     ->placeholder('-'),
-                TextColumn::make('total_hours')
-                    ->label('Hours')
-                    ->suffix(' hrs'),
+                TextColumn::make('total_days')
+                    ->label('Days')
+                    ->suffix(' days'),
                 TextColumn::make('is_late')
                     ->label('Status')
                     ->formatStateUsing(fn ($state) => $state ? 'Late' : 'On Time')
@@ -77,10 +113,96 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                 TextColumn::make('overtime_hours')
                     ->label('Overtime')
                     ->suffix(' hrs'),
+                TextColumn::make('off_days')
+                    ->label('Off Days')
+                    ->state(function (Attendance $attendance) {
+
+                        $schedule = $this->getScheduleByDate($attendance->date);
+
+                        if (!$schedule) {
+                            return '-';
+                        }
+
+                        $today = strtolower(
+                            Carbon::parse($attendance->date)
+                                ->englishDayOfWeek
+                        );
+
+                        $offDays = collect($schedule->off_days)
+                            ->map(fn($day)=>strtolower($day))
+                            ->toArray();
+
+                        return in_array($today, $offDays)
+                            ? ucfirst($today) . ' - OFF'
+                            : '-';
+                    })
+                    ->badge()
+                    ->color('danger'),
             ])
             ->paginated(false)
             ->striped();
     }
+
+    public function isWorkingDay($date): bool
+    {
+        $schedule = $this->getScheduleByDate($date);
+
+        if (!$schedule) {
+            return true;
+        }
+
+        $offDays = collect($schedule->off_days ?? [])
+            ->map(fn ($day) => strtolower($day));
+
+        return ! $offDays->contains(
+            strtolower(Carbon::parse($date)->englishDayOfWeek)
+        );
+    }
+
+    protected function getWorkSchedule(AttendanceReport $record)
+    {
+        return EmployeeWorkSchedule::query()
+            ->where('user_id',$record->user_id)
+            ->whereDate('effective_from','<=',$record->end_date)
+            ->where(function($query) use ($record){
+
+                $query->whereNull('effective_untill')
+                    ->orWhereDate(
+                        'effective_untill',
+                        '>=',
+                        $record->start_date
+                    );
+
+            })
+            ->latest('effective_from')
+            ->first();
+    }
+
+    protected function getScheduleByDate(Carbon|string $date): ?EmployeeWorkSchedule
+    {
+        $date = Carbon::parse($date);
+
+        return $this->workSchedules
+            ->filter(function ($schedule) use ($date) {
+
+                if (Carbon::parse($schedule->effective_from)->gt($date)) {
+                    return false;
+                }
+
+                if (
+                    $schedule->effective_untill &&
+                    Carbon::parse($schedule->effective_untill)->lt($date)
+                ) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->sortByDesc('effective_from')
+            ->first();
+    }
+
+    
 
     protected function getHeaderActions(): array
     {
@@ -110,23 +232,22 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                     $user = $record->user;
                     $startDate = Carbon::parse($record->getRawOriginal('start_date'));
                     $endDate = Carbon::parse($record->getRawOriginal('end_date'));
- 
-                    $attendances = Attendance::query()
-                        ->where('user_id', $record->user_id)
-                        ->whereBetween('date', [
-                            $record->getRawOriginal('start_date'),
-                            $record->getRawOriginal('end_date'),
-                        ])
-                        ->orderBy('date')
-                        ->get()
-                        ->keyBy(fn ($a) => $a->date->format('Y-m-d'));
- 
+
+                    $attendances = app(AttendanceReportService::class)
+                        ->getAttendancesInPeriod($record)
+                        ->keyBy(fn ($a) => Carbon::parse($a->date)->format('Y-m-d'));
+
+                    // Approved leave requests overlapping the period — this is what
+                    // was missing before, so the PDF never showed Leave rows.
+                    $leaveRequests = $this->getApprovedLeaveRequests($record);
+
                     $holidays = [
                         '2026-01-01' => 'Tahun Baru Masehi',
                         '2026-03-20' => 'Hari Raya Nyepi',
                         // ... isi sesuai kalender libur nasional tahun berjalan
                     ];
- 
+                    $workSchedule = $this->getWorkSchedule($record);
+
                     $pdf = Pdf::loadView(
                         'filament.forms.attendance',
                         [
@@ -135,8 +256,11 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                             'endDate' => $endDate,
                             'attendances' => $attendances,
                             'holidays' => $holidays,
+                            'leaveRequests' => $leaveRequests,
+                            'workSchedule' => $workSchedule,                            
                         ]
                     );
+                    
                     return response()->streamDownload(
                         fn () => print($pdf->output()),
                         'Attendance-' . $record->id . '.pdf'
@@ -151,9 +275,9 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
             ->record($this->getRecord())
             ->schema([
                 Section::make('Report Summary')
-                    ->columns(3)
+                    ->columns(4)
                     ->schema([
-                        TextEntry::make('user.name')->label('Karyawan'),
+                        TextEntry::make('user.name')->label('Employee'),
                         TextEntry::make('user.nip')->label('NIP'),
                         TextEntry::make('status')
                             ->badge()
@@ -166,9 +290,26 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
                             }),
                         TextEntry::make('start_date')->label('Period Start')->date('d M Y'),
                         TextEntry::make('end_date')->label('Period End')->date('d M Y'),
-                        TextEntry::make('total_hours')->label('Total Working Hours')->suffix(' hrs'),
-                        TextEntry::make('total_overtime')->label('Total Overtime')->suffix(' hrs'),
-                        TextEntry::make('total_late')->label('Total Late')->suffix(' hrs'),
+                        TextEntry::make('total_days')->label('Total Working Days')->suffix(' days'),
+                        TextEntry::make('total_overtime')->label('Total Overtime')->suffix(' days'),
+                        TextEntry::make('total_late')->label('Total Late')->suffix(' days'),
+                        TextEntry::make('off_days')
+                            ->label('Off Days')
+                            ->state(function () {
+
+                                $schedule = $this->getScheduleByDate(
+                                    $this->record->start_date
+                                );
+
+                                if (!$schedule) {
+                                    return '-';
+                                }
+
+                                return collect($schedule->off_days)
+                                    ->map(fn($day)=>ucfirst($day))
+                                    ->implode(', ');
+                            }),
+                        TextEntry::make('total_leave_days')->label('Total Leave')->suffix(' days'),
                     ]),
             ]);
     }

@@ -6,11 +6,17 @@ use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SettingsService
 {
+    protected array $cache = [];
+
+    // public function __construct(
+    //     protected SettingsService $settings,
+    // ) {}
     protected array $defaults = [
         'general' => [
             'company_name' => 'IGreja Office',
@@ -37,8 +43,17 @@ class SettingsService
         'payroll' => [
             'currency' => 'IDR',
             'payroll_cycle' => 'monthly',
+
+            'monthly_working_hours' => 173,
+            'free_overtime_hours' => 1,
+            'max_paid_overtime_hours' => 4,
             'overtime_rate' => 1.5,
-            'tax_rate' => 0.05,
+
+            'tax_rate' => 0,
+
+            'prepared_by' => '',
+            'approved_by' => '',
+            'received_by' => '',
         ],
         'notifications' => [
             'reminder_enabled' => true,
@@ -56,7 +71,18 @@ class SettingsService
 
     public function all(?User $user = null): array
     {
-        return array_replace_recursive($this->defaults, $this->loadFromDatabase($user));
+        $cacheKey = $user
+            ? 'user_' . $user->getAuthIdentifier()
+            : 'global';
+
+        if (! isset($this->cache[$cacheKey])) {
+            $this->cache[$cacheKey] = array_replace_recursive(
+                $this->defaults,
+                $this->loadFromDatabase($user)
+            );
+        }
+
+        return $this->cache[$cacheKey];
     }
 
     public function get(string $key, mixed $default = null, ?User $user = null): mixed
@@ -66,20 +92,35 @@ class SettingsService
 
     public function put(array $data): void
     {
-        $this->storeToDatabase($this->sanitizePayload($data));
-        $this->apply($this->sanitizePayload($data));
+        $data = $this->sanitizePayload($data);
+
+        $this->storeToDatabase($data);
+
+        $this->clearCache();
+
+        $this->apply($data, Auth::user());
     }
 
     public function putForRole(string $role, array $data): void
     {
-        $this->storeToDatabase($this->sanitizePayload($data), role: $role);
-        $this->apply($this->sanitizePayload($data));
+        $data = $this->sanitizePayload($data);
+
+        $this->storeToDatabase($data);
+
+        $this->clearCache();
+
+        $this->apply($data, Auth::user());
     }
 
     public function putForPermission(string $permission, array $data): void
     {
-        $this->storeToDatabase($this->sanitizePayload($data), permission: $permission);
-        $this->apply($this->sanitizePayload($data));
+        $data = $this->sanitizePayload($data);
+
+        $this->storeToDatabase($data);
+
+        $this->clearCache();
+
+        $this->apply($data, Auth::user());
     }
 
     public function getCompanyName(?User $user = null): string
@@ -91,11 +132,29 @@ class SettingsService
     {
         $logo = $this->get('general.logo', null, $user);
 
+        // Tidak ada logo
         if (blank($logo)) {
             return asset('images/logo_gki.jpeg');
         }
 
-        return str_starts_with((string) $logo, ['http://', 'https://']) ? (string) $logo : asset((string) $logo);
+        // Jika array (data rusak), gunakan logo default
+        if (is_array($logo)) {
+            return asset('images/logo_gki.jpeg');
+        }
+
+        // URL eksternal
+        if (filter_var($logo, FILTER_VALIDATE_URL)) {
+            return $logo;
+        }
+
+        // File tidak ada
+        if (! Storage::disk('public')->exists($logo)) {
+            return asset('images/logo_gki.jpeg');
+        }
+
+        return Storage::disk('public')->url($logo);
+
+        
     }
 
     public function saveLogo(mixed $file): ?string
@@ -104,103 +163,169 @@ class SettingsService
             return null;
         }
 
-        if (is_array($file) && isset($file['tmp_name'])) {
-            $file = $file['tmp_name'];
+        if ($file instanceof UploadedFile) {
+            return $file->store('company-logos', 'public');
         }
 
-        if ($file instanceof UploadedFile) {
-            if (! $file->isValid()) {
-                return null;
+        if (is_array($file)) {
+            foreach ($file as $value) {
+                if ($value instanceof UploadedFile) {
+                    return $value->store('company-logos', 'public');
+                }
+
+                if (is_string($value)) {
+                    return $value;
+                }
             }
 
-            $path = $file->store('company-logos', 'public');
-
-            return $path ? Storage::disk('public')->url($path) : null;
+            return null;
         }
 
-        if (is_string($file) && file_exists($file) && is_file($file)) {
-            $filename = Str::slug(pathinfo($file, PATHINFO_FILENAME)) . '.' . pathinfo($file, PATHINFO_EXTENSION);
-            $path = 'company-logos/' . Str::uuid() . '-' . $filename;
-            Storage::disk('public')->put($path, file_get_contents($file));
-
-            return Storage::disk('public')->url($path);
-        }
-
-        return null;
+        return is_string($file) ? $file : null;
     }
 
-    public function apply(?array $data = null): void
+    public function apply(?array $data, ?User $user = null): void
     {
-        $settings = $data ?? $this->all();
+        $settings = array_replace_recursive(
+            $this->all($user),
+            $data ?? []
+        );
 
         foreach (Arr::dot($settings) as $key => $value) {
-            config(['settings.' . $key => $value]);
+            config(["settings.{$key}" => $value]);
         }
 
-        config([
-            'app.name' => $settings['general']['company_name'] ?? config('app.name'),
-            'attendance.office_latitude' => $settings['attendance']['office_latitude'] ?? config('attendance.office_latitude'),
-            'attendance.office_longitude' => $settings['attendance']['office_longitude'] ?? config('attendance.office_longitude'),
-            'attendance.radius' => $settings['attendance']['radius'] ?? config('attendance.radius'),
-        ]);
-    }
+        $map = [
+            'general.company_name'                     => 'app.name',
 
-    protected function loadFromDatabase(?User $user = null): array
-    {
-        $settings = Setting::query()->where('is_active', true)->get();
-        $globalPayload = [];
-        $rolePayload = [];
-        $permissionPayload = [];
+            'attendance.office_latitude'              => 'attendance.office_latitude',
+            'attendance.office_longitude'             => 'attendance.office_longitude',
+            'attendance.radius'                       => 'attendance.radius',
+            'attendance.check_in_time'                => 'attendance.check_in_time',
+            'attendance.check_out_time'               => 'attendance.check_out_time',
+            'attendance.grace_period_minutes'         => 'attendance.grace_period_minutes',
+            'attendance.working_hours_per_day'        => 'attendance.working_hours_per_day',
 
-        foreach ($settings as $item) {
-            $group = $item->group ?? 'general';
-            $key = $item->key;
+            'leave.default_leave_days'                => 'leave.default_leave_days',
+            'leave.max_leave_days_per_request'        => 'leave.max_leave_days_per_request',
+            'leave.require_approval'                  => 'leave.require_approval',
 
-            if (str_contains($key, '.')) {
-                [$group, $key] = explode('.', $key, 2);
-            }
+            'payroll.currency'                        => 'payroll.currency',
+            'payroll.payroll_cycle'                   => 'payroll.payroll_cycle',
+            'payroll.monthly_working_hours'           => 'payroll.monthly_working_hours',
+            'payroll.free_overtime_hours'             => 'payroll.free_overtime_hours',
+            'payroll.max_paid_overtime_hours'         => 'payroll.max_paid_overtime_hours',
+            'payroll.overtime_rate'                   => 'payroll.overtime_rate',
+            'payroll.tax_rate'                        => 'payroll.tax_rate',
+            'payroll.prepared_by'                     => 'payroll.prepared_by',
+            'payroll.approved_by'                     => 'payroll.approved_by',
+            'payroll.received_by'                     => 'payroll.received_by',
 
-            $value = is_string($item->value) ? json_decode($item->value, true) : $item->value;
-            $value = is_array($value) ? $value : $value;
-            $payload = match ($item->scope) {
-                'role' => $rolePayload,
-                'permission' => $permissionPayload,
-                default => $globalPayload,
-            };
+            'notifications.reminder_enabled'          => 'notifications.reminder_enabled',
+            'notifications.reminder_before_minutes'   => 'notifications.reminder_before_minutes',
 
-            if ($item->scope === 'role' && $user && filled($item->role) && $user->hasRole($item->role)) {
-                $payload[$group][$key] = $value;
-            } elseif ($item->scope === 'permission' && $user && filled($item->permission) && $user->can($item->permission)) {
-                $payload[$group][$key] = $value;
-            } elseif ($item->scope !== 'role' && $item->scope !== 'permission') {
-                $payload[$group][$key] = $value;
+            'security.face_attendance_enabled'        => 'security.face_attendance_enabled',
+        ];
+
+        foreach ($map as $settingKey => $configKey) {
+            $value = data_get($settings, $settingKey);
+
+            if ($value !== null) {
+                config([$configKey => $value]);
             }
         }
-
-        return $this->normalizePayload(array_replace_recursive($this->defaults, $globalPayload, $rolePayload, $permissionPayload));
     }
 
-    protected function storeToDatabase(array $data, ?string $role = null, ?string $permission = null): void
+    public function clearCache(): void
     {
-        $grouped = $this->normalizePayload($data);
+        $this->cache = [];
+    }
 
-        foreach ($grouped as $group => $values) {
+    protected function loadFromDatabase(?User $user): array
+    {
+        $query = Setting::query()
+            ->where('is_active', true)
+            ->where(function ($query) use ($user) {
+                $query->where('scope', 'global');
+
+                if ($user) {
+                    $roles = method_exists($user, 'getRoleNames')
+                        ? $user->getRoleNames()->toArray()
+                        : [];
+
+                    if (! empty($roles)) {
+                        $query->orWhere(function ($q) use ($roles) {
+                            $q->where('scope', 'role')
+                                ->whereIn('role', $roles);
+                        });
+                    }
+
+                    $permissions = method_exists($user, 'getAllPermissions')
+                        ? $user->getAllPermissions()->pluck('name')->toArray()
+                        : [];
+
+                    if (! empty($permissions)) {
+                        $query->orWhere(function ($q) use ($permissions) {
+                            $q->where('scope', 'permission')
+                                ->whereIn('permission', $permissions);
+                        });
+                    }
+                }
+            });
+
+        $settings = $query->get();
+
+        $result = [];
+
+        foreach ($settings as $setting) {
+            data_set(
+                $result,
+                "{$setting->group}.{$setting->key}",
+                json_decode($setting->value, true)
+            );
+        }
+
+        return $result;
+    }
+
+    protected function storeToDatabase(
+        array $data,
+        ?string $role = null,
+        ?string $permission = null
+    ): void {
+
+        $scope = match (true) {
+            $role !== null => 'role',
+            $permission !== null => 'permission',
+            default => 'global',
+        };
+
+        foreach ($this->normalizePayload($data) as $group => $values) {
+
             foreach ($values as $key => $value) {
+
                 Setting::updateOrCreate(
+
                     [
-                        'key' => $key,
-                        'group' => $group,
-                        'role' => $role,
+                        'key'        => $key,
+                        'group'      => $group,
+                        'scope'      => $scope,
+                        'role'       => $role,
                         'permission' => $permission,
                     ],
+
                     [
-                        'value' => $this->encodeValue($value),
-                        'type' => is_bool($value) ? 'boolean' : (is_numeric($value) ? 'number' : 'string'),
-                        'scope' => $role ? 'role' : ($permission ? 'permission' : 'global'),
-                        'role' => $role,
-                        'permission' => $permission,
+                        'value'      => $this->encodeValue($value),
+                        'type'       => match (true) {
+                            is_bool($value) => 'boolean',
+                            is_numeric($value) => 'number',
+                            is_array($value) => 'array',
+                            default => 'string',
+                        },
+
                         'is_active' => true,
                     ]
+
                 );
             }
         }
@@ -226,14 +351,8 @@ class SettingsService
             ->toArray();
     }
 
-    protected function encodeValue(mixed $value): mixed
+    protected function encodeValue(mixed $value): string
     {
-        if ($value instanceof UploadedFile) {
-            return json_encode((string) $value);
-        }
-
-        $encoded = json_encode($value, JSON_UNESCAPED_SLASHES);
-
-        return $encoded === false ? json_encode((string) $value, JSON_UNESCAPED_SLASHES) : $encoded;
+        return json_encode($value, JSON_UNESCAPED_SLASHES);
     }
 }

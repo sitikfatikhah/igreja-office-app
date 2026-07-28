@@ -19,7 +19,7 @@
             padding: 24px 32px;
         }
 
-        /* ===== KOP SURAT ===== */
+        /* ===== LETTERHEAD ===== */
         .kop {
             width: 100%;
             border-bottom: 3px solid #1f2d3d;
@@ -68,7 +68,7 @@
             line-height: 1.5;
         }
 
-        /* ===== JUDUL DOKUMEN ===== */
+        /* ===== DOCUMENT TITLE ===== */
         .doc-title-wrap {
             text-align: center;
             margin-bottom: 14px;
@@ -89,7 +89,7 @@
             margin-top: 2px;
         }
 
-        /* ===== META INFO (No slip, tanggal) ===== */
+        /* ===== META INFO (Slip number, date) ===== */
         .meta-table {
             width: 100%;
             border: none;
@@ -119,7 +119,7 @@
             text-align: right;
         }
 
-        /* ===== INFO KARYAWAN ===== */
+        /* ===== EMPLOYEE INFO ===== */
         .section-heading {
             background-color: #1f2d3d;
             color: #ffffff;
@@ -154,7 +154,7 @@
             font-weight: 600;
         }
 
-        /* ===== TABEL RINCIAN GAJI ===== */
+        /* ===== SALARY BREAKDOWN TABLE ===== */
         table.salary-table {
             width: 100%;
             border-collapse: collapse;
@@ -210,7 +210,7 @@
             color: #b8312f;
         }
 
-        /* ===== TERBILANG ===== */
+        /* ===== AMOUNT IN WORDS ===== */
         .terbilang-box {
             margin-top: 10px;
             padding: 8px 10px;
@@ -225,7 +225,7 @@
             font-style: normal;
         }
 
-        /* ===== CATATAN ===== */
+        /* ===== NOTES ===== */
         .notes-box {
             margin-top: 14px;
             font-size: 10.5px;
@@ -238,7 +238,7 @@
             padding-left: 16px;
         }
 
-        /* ===== TANDA TANGAN ===== */
+        /* ===== SIGNATURE ===== */
         .signature-section {
             width: 100%;
             margin-top: 36px;
@@ -294,7 +294,7 @@
 
 <div class="page">
 
-    {{-- ===================== KOP INSTANSI ===================== --}}
+    {{-- ===================== COMPANY LETTERHEAD ===================== --}}
     <div class="kop">
         <table>
             <tr>
@@ -310,7 +310,7 @@
                     <p class="instansi-name">{{ $instansi->name ?? app(\App\Services\SettingsService::class)->getCompanyName(auth()->user()) }}</p>
                     <p class="instansi-detail">
                         {{ $instansi->address ?? app(\App\Services\SettingsService::class)->get('general.company_address', 'Jl. Sutopo No. 9 Tangerang', auth()->user()) }}<br>
-                        Telp: {{ $instansi->phone ?? app(\App\Services\SettingsService::class)->get('general.company_phone', '(021) 55 237 55', auth()->user()) }} &nbsp;|&nbsp;
+                        Phone: {{ $instansi->phone ?? app(\App\Services\SettingsService::class)->get('general.company_phone', '(021) 55 237 55', auth()->user()) }} &nbsp;|&nbsp;
                         Email: {{ $instansi->email ?? app(\App\Services\SettingsService::class)->get('general.company_email', 'sekretariat@gkisutopo.org', auth()->user()) }} &nbsp;|&nbsp;
                         {{ $instansi->website ?? 'https://gkisutopo.org' }}
                     </p>
@@ -319,24 +319,24 @@
         </table>
     </div>
 
-    {{-- ===================== JUDUL DOKUMEN ===================== --}}
+    {{-- ===================== DOCUMENT TITLE ===================== --}}
     <div class="doc-title-wrap">
-        <p class="doc-title">Slip Gaji Karyawan</p>
+        <p class="doc-title">Employee Payslip</p>
         <p class="doc-subtitle">Employee Payslip</p>
     </div>
 
-    {{-- ===================== META: NO SLIP & TANGGAL ===================== --}}
+    {{-- ===================== META: SLIP NUMBER & DATE ===================== --}}
     <table class="meta-table">
         <tr>
-            <td class="meta-label">No. Slip Gaji</td>
+            <td class="meta-label">Payslip No.</td>
             <td class="meta-colon">:</td>
             <td class="meta-value">{{ $payroll->slip_number ?? ('SG/' . now()->format('Y/m') . '/' . str_pad($payroll->id ?? 0, 5, '0', STR_PAD_LEFT)) }}</td>
             <td class="meta-right">
-                Tanggal Cetak : <strong>{{ now()->translatedFormat('d F Y') }}</strong>
+                Print Date: <strong>{{ now()->translatedFormat('d F Y') }}</strong>
             </td>
         </tr>
         <tr>
-            <td class="meta-label">Periode Penggajian</td>
+            <td class="meta-label">Pay Period</td>
             <td class="meta-colon">:</td>
             <td class="meta-value">
                 {{ \Carbon\Carbon::parse($payroll->attendanceReport?->start_date)->translatedFormat('d F Y') }}
@@ -344,127 +344,130 @@
                 {{ \Carbon\Carbon::parse($payroll->attendanceReport?->end_date)->translatedFormat('d F Y') }}
             </td>
             <td class="meta-right">
-                Status : <strong>{{ $payroll->status_label ?? 'Lunas' }}</strong>
+                Status: <strong>{{ $payroll->status_label ?? 'Paid' }}</strong>
             </td>
         </tr>
     </table>
 
-    {{-- ===================== INFORMASI KARYAWAN ===================== --}}
-    <div class="section-heading">Informasi Karyawan</div>
+    {{-- ===================== EMPLOYEE INFORMATION ===================== --}}
+    <div class="section-heading">Employee Information</div>
     <table class="info-table">
         <tr>
-            <td class="label-col">Nama Karyawan</td>
+            <td class="label-col">Employee Name</td>
             <td class="value-col">{{ $payroll->user?->name ?? '-' }}</td>
-            <td class="label-col">NIP / No. Induk</td>
+            <td class="label-col">NIP / Employee ID</td>
             <td class="value-col">{{ $payroll->user?->nip ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label-col">Jabatan</td>
+            <td class="label-col">Position</td>
             <td class="value-col">{{ $payroll->user?->position ?? $payroll->position ?? '-' }}</td>
-            <td class="label-col">Departemen</td>
+            <td class="label-col">Department</td>
             <td class="value-col">{{ $payroll->user?->department ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label-col">Status Kepegawaian</td>
+            <td class="label-col">Employment Status</td>
             <td class="value-col">{{ $payroll->user?->employment_status ?? '-' }}</td>
-            <td class="label-col">No. Rekening</td>
+            <td class="label-col">Bank Account No.</td>
             <td class="value-col">{{ $payroll->user?->bank_account ?? '-' }}</td>
         </tr>
     </table>
 
-    {{-- ===================== REKAP KEHADIRAN ===================== --}}
-    <div class="section-heading">Rekap Kehadiran</div>
+    {{-- ===================== ATTENDANCE SUMMARY ===================== --}}
+    <div class="section-heading">Attendance Summary</div>
     <table class="info-table">
         <tr>
-            <td class="label-col">Total Jam Kerja</td>
-            <td class="value-col">{{ $payroll->attendanceReport?->total_hours ?? 0 }} jam</td>
-            <td class="label-col">Total Jam Lembur</td>
-            <td class="value-col">{{ $payroll->attendanceReport?->total_overtime ?? 0 }} jam</td>
+            <td class="label-col">Total Working Hours</td>
+            <td class="value-col">{{ $payroll->attendanceReport?->total_hours ?? 0 }} hours</td>
+            <td class="label-col">Total Overtime Hours</td>
+            <td class="value-col">{{ $payroll->attendanceReport?->total_overtime ?? 0 }} hours</td>
         </tr>
         <tr>
-            <td class="label-col">Total Jam Terlambat</td>
-            <td class="value-col">{{ $payroll->attendanceReport?->total_late ?? 0 }} jam</td>
-            <td class="label-col">Status Kehadiran</td>
+            <td class="label-col">Total Late Hours</td>
+            <td class="value-col">{{ $payroll->attendanceReport?->total_late ?? 0 }} hours</td>
+            <td class="label-col">Attendance Status</td>
             <td class="value-col">{{ ucfirst($payroll->attendanceReport?->status ?? '-') }}</td>
         </tr>
     </table>
 
-    {{-- ===================== RINCIAN GAJI ===================== --}}
-    <div class="section-heading">Rincian Penggajian</div>
+    {{-- ===================== SALARY BREAKDOWN ===================== --}}
+    <div class="section-heading">Salary Breakdown</div>
+    
+    @php
+    $currency = data_get($settings,'payroll.currency', 'IDR');
+    @endphp
+
     <table class="salary-table">
         <thead>
             <tr>
-                <th class="col-label">Komponen</th>
-                <th class="col-amount text-right">Jumlah (Rp)</th>
+                <th class="col-label">Component</th>
+                <th class="col-amount text-right">Amount ({{ data_get($settings,'payroll.currency', 'IDR') }})</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>Gaji Pokok (Basic Salary)</td>
-                <td class="text-right">{{ number_format($payroll->gross_pay ?? 0, 0, ',', '.') }}</td>
+                <td>Basic Salary</td>
+                <td class="text-right"> {{ $currency }} {{ number_format($payroll->gross_pay ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>Tunjangan &amp; Insentif Lainnya</td>
-                <td class="text-right">{{ number_format($payroll->additions ?? 0, 0, ',', '.') }}</td>
+                <td>Allowances &amp; Other Incentives</td>
+                <td class="text-right"> {{ $currency }} {{ number_format($payroll->additions ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>Tunjangan Lembur ({{ $payroll->attendanceReport?->total_overtime ?? 0 }} jam)</td>
-                <td class="text-right">{{ number_format($payroll->overtime_pay ?? 0, 0, ',', '.') }}</td>
+                <td>Overtime Allowance ({{ $payroll->attendanceReport?->total_overtime ?? 0 }} hours)</td>
+                <td class="text-right"> {{ $currency }} {{ number_format($payroll->overtime_pay ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr class="subtotal-row">
-                <td>Total Pendapatan (Gross)</td>
+                <td>Total Earnings (Gross)</td>
                 <td class="text-right text-success">
-                    {{ number_format(($payroll->gross_pay ?? 0) + ($payroll->additions ?? 0) + ($payroll->overtime_pay ?? 0), 0, ',', '.') }}
+                    {{ $currency }} {{ number_format(($payroll->gross_pay ?? 0) + ($payroll->additions ?? 0) + ($payroll->overtime_pay ?? 0), 0, ',', '.') }}
                 </td>
             </tr>
 
+            
+                
             <tr>
-                <td>Potongan Keterlambatan ({{ $payroll->attendanceReport?->total_late ?? 0 }} jam)</td>
-                <td class="text-right text-danger">- {{ number_format($payroll->late_deduction ?? 0, 0, ',', '.') }}</td>
+                <td>Health &amp; Employment Social Security (BPJS)</td>
+                <td class="text-right text-danger">- {{ $currency }} {{ number_format($payroll->bpjs_deduction ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr>
-                <td>BPJS Kesehatan &amp; Ketenagakerjaan</td>
-                <td class="text-right text-danger">- {{ number_format($payroll->bpjs_deduction ?? 0, 0, ',', '.') }}</td>
+                <td>Income Tax (PPh 21)</td>
+                <td class="text-right text-danger">- {{ number_format(data_get($settings->'payroll.tax-rate' ?? 0, 0, ',', '.')) }}</td>
             </tr>
             <tr>
-                <td>PPh 21 (Pajak Penghasilan)</td>
-                <td class="text-right text-danger">- {{ number_format($payroll->tax_deduction ?? 0, 0, ',', '.') }}</td>
-            </tr>
-            <tr>
-                <td>Potongan Lainnya</td>
-                <td class="text-right text-danger">- {{ number_format($payroll->deductions ?? 0, 0, ',', '.') }}</td>
+                <td>Other Deductions</td>
+                <td class="text-right text-danger">- {{ $currency }} {{ number_format($payroll->deductions ?? 0, 0, ',', '.') }}</td>
             </tr>
             <tr class="subtotal-row">
-                <td>Total Potongan</td>
+                <td>Total Deductions</td>
                 <td class="text-right text-danger">
-                    - {{ number_format(($payroll->late_deduction ?? 0) + ($payroll->bpjs_deduction ?? 0) + ($payroll->tax_deduction ?? 0) + ($payroll->deductions ?? 0), 0, ',', '.') }}
+                    - {{ $currency }} {{ number_format(($payroll->late_deduction ?? 0) + ($payroll->bpjs_deduction ?? 0) + ($payroll->tax_deduction ?? 0) + ($payroll->deductions ?? 0), 0, ',', '.') }}
                 </td>
             </tr>
 
             <tr class="grand-total-row">
                 <td>TAKE HOME PAY (THP)</td>
-                <td class="text-right">Rp {{ number_format($payroll->net_pay ?? 0, 0, ',', '.') }}</td>
+                <td class="text-right">{{ $currency }} {{ number_format($payroll->net_pay ?? 0, 0, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
 
-    {{-- ===================== TERBILANG ===================== --}}
+    {{-- ===================== AMOUNT IN WORDS ===================== --}}
     {{-- <div class="terbilang-box">
-        <span class="terbilang-label">Terbilang:</span>
+        <span class="terbilang-label">Amount in words:</span>
         {{ ucwords(\App\Helpers\Terbilang::make($payroll->net_pay ?? 0) ?? '-') }} Rupiah
     </div> --}}
 
-    {{-- ===================== CATATAN ===================== --}}
+    {{-- ===================== NOTES ===================== --}}
     <div class="notes-box">
-        <strong>Catatan:</strong>
+        <strong>Notes:</strong>
         <ol>
-            <li>Slip gaji ini dicetak secara otomatis oleh sistem dan sah tanpa memerlukan cap basah apabila telah ditandatangani secara digital.</li>
-            <li>Mohon segera menghubungi bagian HRD/Payroll apabila terdapat ketidaksesuaian data dalam slip gaji ini.</li>
-            <li>Dokumen ini bersifat rahasia dan hanya diperuntukkan bagi karyawan yang bersangkutan.</li>
+            <li>This payslip is generated automatically by the system and is valid without a wet-ink stamp once digitally signed.</li>
+            <li>Please contact the HR/Payroll department promptly if any data on this payslip appears incorrect.</li>
+            <li>This document is confidential and intended solely for the employee named above.</li>
         </ol>
     </div>
 
-    {{-- ===================== TANDA TANGAN ===================== --}}
+    {{-- ===================== SIGNATURE ===================== --}}
     <div class="signature-section">
         <table class="signature-table">
             <tr>
@@ -472,15 +475,15 @@
                     <div class="signature-place-date">
                         {{ $instansi->city ?? 'Tangerang' }}, {{ now()->translatedFormat('d F Y') }}
                     </div>
-                    <div class="signature-role">Dibuat oleh,</div>
-                    <div class="signature-name">{{ $payroll->preparedBy?->name ?? 'Staff HRD/Payroll' }}</div>
-                    <div class="signature-position">{{ $payroll->preparedBy?->position ?? 'Bagian Penggajian' }}</div>
+                    <div class="signature-role">Prepared by,</div>
+                    <div class="signature-name">{{ $payroll->preparedBy?->name ?? 'HR/Payroll Staff' }}</div>
+                    <div class="signature-position">{{ $payroll->preparedBy?->position ?? 'Payroll Department' }}</div>
                 </td>
                 <td>
                     <div class="signature-place-date">&nbsp;</div>
-                    <div class="signature-role">Diterima oleh,</div>
+                    <div class="signature-role">Received by,</div>
                     <div class="signature-name">{{ $payroll->user?->name ?? '-' }}</div>
-                    <div class="signature-position">{{ $payroll->user?->position ?? $payroll->position ?? 'Karyawan' }}</div>
+                    <div class="signature-position">{{ $payroll->user?->position ?? $payroll->position ?? 'Employee' }}</div>
                 </td>
             </tr>
         </table>
@@ -488,8 +491,8 @@
 
     {{-- ===================== FOOTER ===================== --}}
     <div class="footer">
-        Dokumen ini dibuat secara otomatis oleh sistem penggajian {{ $instansi->name ?? config('app.name') }} &mdash;
-        Dicetak pada {{ now()->translatedFormat('d F Y, H:i') }} WIB
+        This document was generated automatically by the {{ $instansi->name ?? config('app.name') }} payroll system &mdash;
+        Printed on {{ now()->translatedFormat('d F Y, H:i') }} WIB (Western Indonesia Time)
     </div>
 
 </div>

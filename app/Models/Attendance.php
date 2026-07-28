@@ -28,6 +28,8 @@ class Attendance extends Model
         'verification_score',
         'verification_method',
         'face_verified',
+        'status',
+        'leave_request_id',
     ];
 
     protected $casts = [
@@ -36,11 +38,16 @@ class Attendance extends Model
         'check_out' => 'datetime',
         'verification_score' => 'float',
         'face_verified' => 'boolean',
+        'status' => 'string',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    public function leaveRequest(): BelongsTo
+    {
+        return $this->belongsTo(LeaveRequest::class);
     }
 
     public function getNipAttribute($value): ?string
@@ -133,17 +140,33 @@ class Attendance extends Model
             return false;
         }
 
+        $checkInTime = app(\App\Services\SettingsService::class)
+            ->get('attendance.check_in_time', '08:00');
+
+        [$hour, $minute] = explode(':', str_pad($checkInTime, 5, ':00', STR_PAD_RIGHT));
+
         $officeHour = $this->check_in
             ->copy()
-            ->setTime(8, 0);
+            ->setTime((int) $hour, (int) $minute);
 
         return $this->check_in->greaterThan($officeHour);
+    }
+    
+    public function getTotalDaysAttribute(): float
+    {
+        $workingHours = (float) app(\App\Services\SettingsService::class)
+            ->get('attendance.working_hours_per_day', 8);
+
+        return $workingHours > 0
+            ? round($this->total_hours / $workingHours, 2)
+            : 0;
     }
 
     public function getOvertimeHoursAttribute(): float
     {
-        return $this->total_hours > 8
-            ? round($this->total_hours - 8, 2)
-            : 0;
+        $workingHours = (float) app(\App\Services\SettingsService::class)
+            ->get('attendance.working_hours_per_day', 8);
+
+        return max(0, round($this->total_hours - $workingHours, 2));
     }
 }

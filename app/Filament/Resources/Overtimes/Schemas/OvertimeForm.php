@@ -34,13 +34,16 @@ class OvertimeForm
                             $set('position', $user?->position);
                         })
                         ->required()
+                        ->disabled(fn() =>auth()->user()->hasRole('user'))
+                        ->default(fn () => auth()->user()?->id)
                         ->helperText('Select an employee.'),
 
                     TextInput::make('position')
                         ->label('Position')
-                        ->disabled()
                         ->dehydrated()
                         ->required()
+                        ->default(fn (Get $get) => User::find($get('user_id'))?->position)
+                        ->disabled(fn() =>auth()->user()->hasRole('user'))
                         ->helperText('Employee position.'),
 
                     DatePicker::make('overtime_date')
@@ -51,7 +54,7 @@ class OvertimeForm
 
                     TextInput::make('total_hours')
                         ->label('Total Hours')
-                        ->disabled()
+                        ->disabled(fn() =>auth()->user()->hasRole('user'))
                         ->numeric()
                         ->required()
                         ->helperText('Calculated overtime hours.'),
@@ -83,6 +86,8 @@ class OvertimeForm
 
                     Select::make('approval_status')
                         ->label('Approval Status')
+                        ->default('Pending')
+                        ->disabled(fn() =>auth()->user()->hasRole('user'))
                         ->options([
                             'Pending' => 'Pending',
                             'Approved' => 'Approved',
@@ -91,17 +96,18 @@ class OvertimeForm
                         ->required()
                         ->helperText('Select the approval status.'),
 
-                    TextInput::make('approved_by')
-                        ->default(fn () => auth()->user()?->name)
-                        ->disabled()
-                        ->label('Approved By')
-                        ->helperText('Approver name.'),
-
                     Textarea::make('reason')
                         ->rows(3)
                         ->autosize()
                         ->label('Reason')
                         ->helperText('Enter the reason for overtime.'),
+
+                    TextInput::make('approved_by')
+                        ->disabled(fn() =>auth()->user()->hasRole('user'))
+                        ->label('Approved By')
+                        ->helperText('Approver name.'),
+
+                    
             ]);
     }
 

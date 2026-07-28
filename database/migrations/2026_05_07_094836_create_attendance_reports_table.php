@@ -16,9 +16,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
+            $table->integer('total_present')->default(0);
+            $table->integer('total_absent')->default(0);
+            $table->integer('total_overtime')->default(0);
+            $table->integer('total_leave')->default(0);
             $table->integer('total_hours')->default(0);
-            $table->integer('total_late')->default(false);
-            $table->integer('total_overtime')->default(false);
+            $table->integer('attendances_in_period')->nullable();
             $table->string('status')->default('present');
             $table->string('report_date')->default('present');
             $table->string('description')->nullable();

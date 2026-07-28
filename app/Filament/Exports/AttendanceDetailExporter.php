@@ -29,9 +29,9 @@ class AttendanceDetailExporter extends Exporter
                 ->label('Check Out')
                 ->formatStateUsing(fn ($state) => $state?->format('H:i') ?? '-'),
 
-            ExportColumn::make('total_hours')
-                ->label('Total Hours')
-                ->state(fn (Attendance $record) => $record->total_hours),
+            ExportColumn::make('total_days')
+                ->label('Total Days')
+                ->state(fn (Attendance $record) => $record->total_days),
 
             ExportColumn::make('late_hours')
                 ->label('Late (hrs)')
@@ -47,7 +47,7 @@ class AttendanceDetailExporter extends Exporter
 
             ExportColumn::make('overtime_hours')
                 ->label('Overtime (hrs)')
-                ->state(fn (Overtimes $record) => $record->total_hours),
+                ->state(fn (Overtimes $record) => $record->total_days),
 
             ExportColumn::make('check_in_location_name')
                 ->label('Location Check In')

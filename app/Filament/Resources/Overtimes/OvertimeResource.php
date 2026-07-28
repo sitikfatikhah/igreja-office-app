@@ -8,8 +8,6 @@ use App\Filament\Resources\Overtimes\Pages\EditOvertime;
 use App\Filament\Resources\Overtimes\Pages\ListOvertimes;
 use App\Filament\Resources\Overtimes\Schemas\OvertimeForm;
 use App\Filament\Resources\Overtimes\Tables\OvertimesTable;
-use App\Models\Attendance;
-use App\Models\Overtime;
 use App\Models\Overtimes;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -59,5 +57,18 @@ class OvertimeResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+
+        if ($user->hasRole('user')) {
+            return $query->where('user_id', $user->id);
+        }
+
+        return $query;
     }
 }

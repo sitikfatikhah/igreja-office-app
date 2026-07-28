@@ -201,7 +201,7 @@
         <input id="descriptorInput" type="hidden" />
         <input id="referencePhotoInput" type="hidden"/>
     </div>
-
+    
     @vite([
         'resources/js/face-enrollment.js',
     ])

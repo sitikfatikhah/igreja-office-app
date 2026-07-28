@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('department')->required();
             $table->string('password');
             $table->rememberToken();
+            $table->foreignId('allowance_id')->cascade()->onDelete();
+            $table->foreignId('compensation_id')->cascade()->onDelete();
             $table->longText('face_descriptor')->nullable();
             $table->longText('reference_photo')->nullable();
             $table->softDeletes();

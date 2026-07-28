@@ -19,12 +19,22 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 
 class AttendancesTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(function(Builder $query){
+                $user = Auth::user();
+
+                if ($user->hasRole('super_admin')){
+                    return $query;
+                }
+
+                return $query->where('user_id', $user->id);
+            })
             ->columns([
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('user.name')->label('User')->sortable()->searchable(),
@@ -51,7 +61,7 @@ class AttendancesTable
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Karyawan')
+                    ->label('Employee')
                     ->options(
                         User::query()
                             ->get()
@@ -91,7 +101,7 @@ class AttendancesTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                Action::make('downloadSlip')
+                Action::make('downloadAttendance')
                 ->icon('heroicon-o-document-arrow-down')
                 ->action(function ($record) {
 
@@ -104,7 +114,7 @@ class AttendancesTable
 
                     return response()->streamDownload(
                         fn () => print($pdf->output()),
-                        'slip-gaji-' . $record->id . '.pdf'
+                        'attendance' . $record->id . '.pdf'
                     );
                 }),
             ])

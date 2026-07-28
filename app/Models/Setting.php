@@ -16,4 +16,9 @@ class Setting extends Model
         'permission',
         'is_active',
     ];
+
+    protected $casts = [
+        // 'value' => 'array',
+        'is_active' => 'boolean',
+    ];
 }

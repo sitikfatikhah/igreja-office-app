@@ -20,11 +20,11 @@ class ListAttendanceReports extends ListRecords
         return [
             // CreateAction::make(),
             Action::make('generateReport')
-                ->label('Generate Report')
+                ->label('Buat Laporan')
                 ->icon('heroicon-o-arrow-path')
                 ->form([
                     Select::make('user_id')
-                        ->label('Employee')
+                        ->label('Karyawan')
                         ->relationship('user', 'name')
                         ->required(),
 
@@ -33,15 +33,15 @@ class ListAttendanceReports extends ListRecords
                 ])
                 ->action(function (array $data) {
                     app(AttendanceReportService::class)
-                        ->generateForUser(
+                        ->generate(
                             $data['user_id'],
                             $data['start_date'],
                             $data['end_date']
                         );
-                     Notification::make()
-                        ->title('Report Generated Successfully')
-                        ->success()
-                        ->send();
+                            Notification::make()
+                                ->title('Laporan berhasil dibuat')
+                                ->success()
+                                ->send();
                 }),
         ];
     }

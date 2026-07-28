@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Models\Allowance;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,6 +19,9 @@ class UsersTable
         ->paginationMode(PaginationMode::Simple)
         ->striped()
             ->columns([
+                TextColumn::make('id')
+                    ->label('User Id')
+                    ->searchable(),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('email')
@@ -26,6 +30,14 @@ class UsersTable
                 TextColumn::make('position')
                     ->label('Position')
                     ->sortable(),
+                TextColumn::make('allowance.type')
+                    ->label('Allowance Type'),
+                TextColumn::make('allowance.amount')
+                    ->label('Allowance Amount')
+                    ->money('IDR'),
+                TextColumn::make('compensation.basic_salary')
+                    ->label('Basic Salary')
+                    ->money('IDR'),
                 TextColumn::make('nip')
                     ->label('NIP')
                     ->sortable(),

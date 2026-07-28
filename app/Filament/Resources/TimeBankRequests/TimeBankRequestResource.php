@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class TimeBankRequestResource extends Resource
 {
@@ -47,5 +48,20 @@ class TimeBankRequestResource extends Resource
             'create' => CreateTimeBankRequest::route('/create'),
             'edit' => EditTimeBankRequest::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        $user = auth()->user();
+
+        // Super Admin dan Admin dapat melihat semua data
+        if ($user->hasRole(['super_admin', 'admin'])) {
+            return $query;
+        }
+
+        // User hanya melihat data miliknya sendiri
+        return $query->where('user_id', $user->id);
     }
 }

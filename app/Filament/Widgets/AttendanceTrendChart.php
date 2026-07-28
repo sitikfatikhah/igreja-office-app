@@ -16,7 +16,7 @@ class AttendanceTrendChart extends ChartWidget
 
     protected ?string $heading = 'Attendance Trend';
 
-    protected ?string $description = 'Total working hours, late hours, and overtime hours over time.';
+    protected ?string $description = 'Total working days, late hours, and overtime hours over time.';
 
     protected ?string $pollingInterval = '60s';
 
@@ -47,8 +47,8 @@ class AttendanceTrendChart extends ChartWidget
         $data = AttendanceReport::query()
             ->select(
                 DB::raw('MONTH(report_date) as month'),
-                DB::raw('SUM(total_hours) as total_hours'),
-                DB::raw('SUM(total_late) as total_late'),
+                DB::raw('SUM(total_present) as total_present'),
+                DB::raw('SUM(total_absent) as total_absent'),
                 DB::raw('SUM(total_overtime) as total_overtime')
             )
             ->whereYear('report_date', now()->year)
@@ -59,15 +59,15 @@ class AttendanceTrendChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Working Hours',
-                    'data' => $data->pluck('total_hours')->toArray(),
+                    'label' => 'Working Days',
+                    'data' => $data->pluck('total_present')->toArray(),
                     'borderColor' => '#22c55e',
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',
                     'fill' => true,
                 ],
                 [
-                    'label' => 'Late Hours',
-                    'data' => $data->pluck('total_late')->toArray(),
+                    'label' => 'Absent Days',
+                    'data' => $data->pluck('total_absent')->toArray(),
                     'borderColor' => '#f59e0b',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
                     'fill' => true,
@@ -107,8 +107,8 @@ class AttendanceTrendChart extends ChartWidget
         $data = AttendanceReport::query()
             ->select(
                 'report_date',
-                DB::raw('SUM(total_hours) as total_hours'),
-                DB::raw('SUM(total_late) as total_late'),
+                DB::raw('SUM(total_present) as total_present'),
+                DB::raw('SUM(total_absent) as total_absent'),
                 DB::raw('SUM(total_overtime) as total_overtime')
             )
             ->whereBetween('report_date', [$start->format('Y-m-d'), $end->format('Y-m-d')])
@@ -128,7 +128,7 @@ class AttendanceTrendChart extends ChartWidget
             $row = $data->get($key);
 
             $labels[] = $cursor->format('d M');
-            $hours[] = $row?->total_hours ?? 0;
+            $hours[] = $row?->total_present ?? 0;
             $late[] = $row?->total_late ?? 0;
             $overtime[] = $row?->total_overtime ?? 0;
 
@@ -138,7 +138,7 @@ class AttendanceTrendChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Working Hours',
+                    'label' => 'Working Days',
                     'data' => $hours,
                     'borderColor' => '#22c55e',
                     'backgroundColor' => 'rgba(34, 197, 94, 0.1)',

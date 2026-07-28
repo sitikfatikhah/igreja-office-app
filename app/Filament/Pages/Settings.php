@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Services\SettingsService;
 use BackedEnum;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\FileUpload;
@@ -25,6 +26,8 @@ class Settings extends Page implements HasForms
 {
     use InteractsWithForms;
 
+    use HasPageShield;
+
     protected string $view = 'filament.pages.settings';
 
     protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-cog-6-tooth';
@@ -37,7 +40,9 @@ class Settings extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->data = app(SettingsService::class)->all();
+        $this->form->fill(
+            app(SettingsService::class)->all()
+        );
     }
 
     public function form(Schema $schema): Schema
@@ -66,7 +71,8 @@ class Settings extends Page implements HasForms
                             ->disk('public')
                             ->directory('company-logos')
                             ->image()
-                            ->imageEditor()
+                            ->visibility('public')
+                            ->moveFiles()
                             ->helperText('Unggah logo lembaga.'),
                         Textarea::make('general.company_address')
                             ->label('Company Address')
@@ -82,7 +88,7 @@ class Settings extends Page implements HasForms
                             ])
                             ->required()
                             ->helperText('Zona waktu kerja.'),
-                    ]),
+                ]),
 
                 Section::make('Attendance Configuration')
                     ->description('Aturan absensi')
@@ -118,7 +124,7 @@ class Settings extends Page implements HasForms
                             ->numeric()
                             ->minValue(1)
                             ->helperText('Jam kerja harian.'),
-                    ]),
+                ]),
 
                 Section::make('Leave Management')
                     ->description('Kebijakan cuti')
@@ -136,7 +142,20 @@ class Settings extends Page implements HasForms
                         Checkbox::make('leave.require_approval')
                             ->label('Require Approval For Leave Requests')
                             ->helperText('Wajib persetujuan.'),
-                    ]),
+                ]),
+                Section::make('Overtime Management')
+                    ->description('Overtime Setting')
+                    ->schema([
+                        TextInput::make('payroll.free_overtime_hours')
+                            ->label('Free Overtime Hours')
+                            ->minValue(0)
+                            ->helperText('Free Overtime Hours'),
+                        TextInput::make('payroll.max_paid_overtime_hours')
+                            ->label('Max paid overtime Per Request')
+                            ->numeric()
+                            ->minValue(1)
+                            ->helperText('MMax paid overtime Per Request.'),
+                ]),
 
                 Section::make('Payroll Settings')
                     ->description('Default penggajian')
@@ -164,7 +183,14 @@ class Settings extends Page implements HasForms
                             ->numeric()
                             ->step('0.01')
                             ->helperText('Tarif pajak.'),
-                    ]),
+                ]),
+                Section::make('Payroll Approval')
+                    ->description('Default Approval')
+                    ->schema([
+                        TextInput::make('payroll.prepared_by'),
+                        TextInput::make('payroll.approved_by'),
+                        TextInput::make('payroll.received_by'),
+                ]),
 
                 Section::make('Notifications')
                     ->description('Pengingat otomatis')
@@ -177,7 +203,7 @@ class Settings extends Page implements HasForms
                             ->numeric()
                             ->minValue(1)
                             ->helperText('Jeda pengingat.'),
-                    ]),
+                ]),
 
                 Section::make('Security & Access')
                     ->description('Kontrol keamanan')
@@ -185,7 +211,7 @@ class Settings extends Page implements HasForms
                         Checkbox::make('security.face_attendance_enabled')
                             ->label('Enable Face Attendance')
                             ->helperText('Aktifkan absensi wajah.'),
-                    ]),
+                ]),
 
                 ...($canManageRoleSettings ? [
                     Section::make('Role & Permission Settings')
@@ -225,7 +251,7 @@ class Settings extends Page implements HasForms
     {
         return [
             Action::make('save')
-                ->label('Save Settings')
+                ->label('Simpan Pengaturan')
                 ->action(fn () => $this->save())
                 ->icon('heroicon-o-check')
                 ->color('primary'),
@@ -234,13 +260,15 @@ class Settings extends Page implements HasForms
 
     public function save(): void
     {
-        $data = $this->data ?? [];
+        $data = $this->form->getState();
+
         $scope = $data['settings_scope'] ?? 'global';
         $role = $data['settings_role'] ?? null;
         $permission = $data['settings_permission'] ?? null;
 
         if (isset($data['general']['logo'])) {
             $logoInput = $data['general']['logo'];
+
             $logoPath = app(SettingsService::class)->saveLogo($logoInput);
 
             if ($logoPath) {
@@ -256,19 +284,24 @@ class Settings extends Page implements HasForms
             app(SettingsService::class)->put($data);
         }
 
+        // <-- isi ulang form
+        $this->form->fill(
+            app(SettingsService::class)->all(auth()->user())
+        );
+
         Notification::make()
-            ->title('Settings updated successfully')
+            ->title('Pengaturan berhasil diperbarui')
             ->success()
             ->send();
     }
 
     public function getTitle(): string
     {
-        return 'System Settings';
+        return 'Pengaturan Sistem';
     }
 
     public function getHeading(): string
     {
-        return 'System Settings';
+        return 'Pengaturan Sistem';
     }
 }

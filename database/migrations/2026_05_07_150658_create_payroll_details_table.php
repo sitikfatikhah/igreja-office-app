@@ -6,30 +6,43 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('payroll_details', function (Blueprint $table) {
+
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('payroll_id')->constrained('payrolls')->onDelete('cascade');
-            $table->decimal('basic_salary', 10, 2);
-            $table->decimal('overtime_pay', 10, 2)->default(0);
-            $table->decimal('allowances', 10, 2)->default(0);
-            $table->decimal('deductions', 10, 2)->default(0);
-            $table->decimal('total_salary', 10, 2);
-            $table->integer('attendance')->default(0);
-            $table->text('description')->nullable();
-            $table->softDeletes();
+
+            $table->foreignId('payroll_id')->constrained('payrolls');
+
+            $table->foreignId('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->enum('type', [
+                'earning',
+                'deduction',
+            ]);
+
+            $table->string('category');
+
+            $table->string('a')->nullable();
+
+            $table->unsignedBigInteger('reference_id')->nullable();
+
+            $table->string('description');
+
+            $table->decimal('qty',8,2)->default(1);
+
+            $table->decimal('rate',15,2)->default(0);
+
+            $table->decimal('amount',15,2);
+
             $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('payroll_details');

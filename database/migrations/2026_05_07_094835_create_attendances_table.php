@@ -28,6 +28,8 @@ return new class extends Migration
             $table->decimal('verification_score', 5, 4)->nullable();
             $table->string('verification_method')->default('face_recognition');
             $table->boolean('face_verified')->default(false);
+            $table->enum('status', ['present', 'absent', 'leave', 'time_off'])->default('present');
+            $table->foreignId('leave_request_id')->nullable()->constrained();
             $table->timestamps();
         });
     }
@@ -40,6 +42,8 @@ return new class extends Migration
         Schema::dropIfExists('attendances');
         Schema::table('attendances', function (Blueprint $table) {
             $table->dropColumn('face_verified');
+            $table->dropColumn('status');
+            $table->dropColumn('leave_request_id');
         });
     }
 };
