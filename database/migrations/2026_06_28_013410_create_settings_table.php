@@ -24,7 +24,7 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(
             ['key', 'group', 'scope', 'role', 'permission'],
-            'settings_scope_unique'
+            'scope_unique'
         );
         });
     }
