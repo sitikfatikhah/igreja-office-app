@@ -18,6 +18,7 @@ use App\Filament\Widgets\RecentActivitiesWidget;
 use App\Services\SettingsService;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Enums\UserMenuPosition;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -41,8 +42,14 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path('app')
             ->login()
+            ->registration()
+            ->passwordReset()
+            ->emailVerification()
+            ->emailChangeVerification()
+            ->profile()
+            ->userMenu(position: UserMenuPosition::Sidebar)
             ->brandLogo(fn () => app(SettingsService::class)->getCompanyLogo())
             ->brandLogoHeight('4rem')
             ->colors([
