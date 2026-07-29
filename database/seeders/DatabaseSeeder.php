@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
         [
             'name' => 'Admin',
             'password' => bcrypt('password'),
-            'nip' => '123456789',
+            'nip' => '12345',
             'department' => 'IT',
             'position' => 'Manager',
             'allowance_id' => 2,
@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
         [
             'name' => 'User',
             'password' => bcrypt('password'),
-            'nip' => '123456789',
+            'nip' => '67891',
             'department' => 'HR',
             'position' => 'Staff',
             'allowance_id' => 1,
