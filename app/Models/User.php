@@ -3,8 +3,10 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -18,9 +20,21 @@ use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'nip', 'position', 'department', 'allowance_id', 'compensation_id'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable implements HasAvatar
+class User extends Authenticatable implements FilamentUser, HasAvatar
 {
     use Notifiable, SoftDeletes, HasRoles;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $this->hasRole('super_admin');
+    }
+
+    public function getFilamentAvatarUrl(): ?string
+    {
+        return $this->avatar_url;
+    }
+
+
 
     /**
      * Get the attributes that should be cast.
@@ -35,11 +49,6 @@ class User extends Authenticatable implements HasAvatar
         'nip' => 'string',
         'department' => 'string',
     ];
-
-    public function getFilamentAvatarUrl(): ?string
-    {
-        return $this->avatar_url;
-    }
     
     public function workSchedule() : HasMany
     {
