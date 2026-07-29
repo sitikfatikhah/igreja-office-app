@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             'position' => 'Manager',
             'allowance_id' => '2',
             'compensation_id' => '2',
+            
         ]);
         User::factory()->create([
             'name' => 'Another Test User',
