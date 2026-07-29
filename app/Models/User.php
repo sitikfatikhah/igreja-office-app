@@ -35,7 +35,6 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     }
 
 
-
     /**
      * Get the attributes that should be cast.
      *
