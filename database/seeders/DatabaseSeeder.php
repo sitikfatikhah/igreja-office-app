@@ -18,26 +18,29 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        User::updateOrCreate(
+        ['email' => 'test@example.com'],
+        [
+            'name' => 'Admin',
             'password' => bcrypt('password'),
             'nip' => '123456789',
             'department' => 'IT',
             'position' => 'Manager',
-            'allowance_id' => '2',
-            'compensation_id' => '2',
-            
-        ]);
-        User::factory()->create([
-            'name' => 'Another Test User',
-            'email' => 'another.test@example.com',
+            'allowance_id' => 2,
+            'compensation_id' => 2,
+        ]
+    );
+    User::updateOrCreate(
+        ['email' => 'test@example2.com'],
+        [
+            'name' => 'User',
             'password' => bcrypt('password'),
-            'nip' => '987654321',
+            'nip' => '123456789',
             'department' => 'HR',
             'position' => 'Staff',
-            'allowance_id' => '1',
-            'compensation_id' => '1',
-        ]);
+            'allowance_id' => 1,
+            'compensation_id' => 1,
+        ]
+    );
     }
 }
