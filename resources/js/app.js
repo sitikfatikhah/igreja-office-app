@@ -1,1 +1,3 @@
-import './face-enroll';
+// import './face-enrollment';
+
+import './bootstrap';
