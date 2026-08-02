@@ -133,7 +133,7 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $sheet->setCellValue(
                     'A5',
-                    'EMPLOYEE PAYSLIP'
+                    'SLIP GAJI PEGAWAI'
                 );
 
                 $sheet->getStyle('A5')->applyFromArray([
@@ -154,11 +154,11 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $row = 7;
 
-                $sheet->setCellValue("A{$row}", "Payslip No");
-                $sheet->setCellValue("B{$row}", $this->payroll->id);
+                $sheet->setCellValue("A{$row}", "No. Slip");
+                $sheet->setCellValue("B{$row}", $this->payroll->slip_number ?? ('SG/' . now()->format('Y/m') . '/' . str_pad($this->payroll->id ?? 0, 5, '0', STR_PAD_LEFT)));
 
-                $sheet->setCellValue("D{$row}", "Print Date");
-                $sheet->setCellValue("E{$row}", now()->format('d-m-Y'));
+                $sheet->setCellValue("D{$row}", "Tanggal Cetak");
+                $sheet->setCellValue("E{$row}", now()->translatedFormat('d F Y'));
 
                 $row += 2;
 
@@ -172,7 +172,7 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $sheet->setCellValue(
                     "A{$row}",
-                    "EMPLOYEE INFORMATION"
+                    "INFORMASI PEGAWAI"
                 );
 
                 $sheet->getStyle("A{$row}:F{$row}")
@@ -189,19 +189,19 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Name");
-                $sheet->setCellValue("B{$row}", $this->payroll->user?->name);
+                $sheet->setCellValue("A{$row}", "Nama Pegawai");
+                $sheet->setCellValue("B{$row}", $this->payroll->user?->name ?? '-');
 
-                $sheet->setCellValue("D{$row}", "NIP");
-                $sheet->setCellValue("E{$row}", $this->payroll->user?->nip);
+                $sheet->setCellValue("D{$row}", "NIP / ID Pegawai");
+                $sheet->setCellValue("E{$row}", $this->payroll->user?->nip ?? '-');
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Position");
-                $sheet->setCellValue("B{$row}", $this->payroll->user?->position);
+                $sheet->setCellValue("A{$row}", "Jabatan");
+                $sheet->setCellValue("B{$row}", $this->payroll->user?->position ?? $this->payroll->position ?? '-');
 
-                $sheet->setCellValue("D{$row}", "Department");
-                $sheet->setCellValue("E{$row}", $this->payroll->user?->department);
+                $sheet->setCellValue("D{$row}", "Departemen");
+                $sheet->setCellValue("E{$row}", $this->payroll->user?->department ?? '-');
 
                 /*
                 |--------------------------------------------------------------------------
@@ -215,7 +215,7 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $sheet->setCellValue(
                     "A{$row}",
-                    "SALARY BREAKDOWN"
+                    "RINCIAN GAJI"
                 );
 
                 $sheet->getStyle("A{$row}:F{$row}")
@@ -232,44 +232,44 @@ class PayrollSlipExport implements FromCollection, WithEvents, ShouldAutoSize
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Component");
-                $sheet->setCellValue("E{$row}", "Amount");
+                $sheet->setCellValue("A{$row}", "Komponen");
+                $sheet->setCellValue("E{$row}", "Nominal");
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Basic Salary");
-                $sheet->setCellValue("E{$row}", $this->payroll->basic_pay);
+                $sheet->setCellValue("A{$row}", "Gaji Pokok");
+                $sheet->setCellValue("E{$row}", $this->payroll->basic_salary ?? $this->payroll->basic_pay ?? 0);
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Allowance");
-                $sheet->setCellValue("E{$row}", $this->payroll->addition_total);
+                $sheet->setCellValue("A{$row}", "Tunjangan & Insentif Lainnya");
+                $sheet->setCellValue("E{$row}", $this->payroll->addition_total ?? $this->payroll->additions ?? 0);
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Overtime");
-                $sheet->setCellValue("E{$row}", $this->payroll->overtime_pay);
+                $sheet->setCellValue("A{$row}", 'Tunjangan Lembur (' . ($this->payroll->attendanceReport?->total_overtime ?? 0) . ' jam)');
+                $sheet->setCellValue("E{$row}", $this->payroll->overtime_pay ?? 0);
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "BPJS");
-                $sheet->setCellValue("E{$row}", -$this->payroll->bpjs_deduction);
+                $sheet->setCellValue("A{$row}", "Jaminan Kesehatan & Ketenagakerjaan (BPJS)");
+                $sheet->setCellValue("E{$row}", -($this->payroll->bpjs_deduction ?? 0));
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Tax");
-                $sheet->setCellValue("E{$row}", -$this->payroll->tax_deduction);
+                $sheet->setCellValue("A{$row}", "Pajak Penghasilan (PPh 21)");
+                $sheet->setCellValue("E{$row}", -($this->payroll->tax_deduction ?? 0));
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "Other Deduction");
-                $sheet->setCellValue("E{$row}", -$this->payroll->deduction_total);
+                $sheet->setCellValue("A{$row}", "Potongan Lainnya");
+                $sheet->setCellValue("E{$row}", -($this->payroll->deduction_total ?? $this->payroll->deductions ?? 0));
 
                 $row++;
 
-                $sheet->setCellValue("A{$row}", "TAKE HOME PAY");
+                $sheet->setCellValue("A{$row}", "GAJI DITERIMA (THP)");
 
-                $sheet->setCellValue("E{$row}", $this->payroll->net_pay);
+                $sheet->setCellValue("E{$row}", $this->payroll->net_pay ?? 0);
 
                 $sheet->getStyle("A{$row}:F{$row}")
                     ->applyFromArray([

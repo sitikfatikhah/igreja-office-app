@@ -352,6 +352,15 @@
             'Tangerang',
             auth()->user()
         );
+
+        $instansi = $instansi ?? (object) [
+            'name' => $companyName,
+            'address' => $companyAddress,
+            'phone' => $companyPhone,
+            'email' => $companyEmail,
+            'website' => $companyWebsite,
+            'city' => $city,
+        ];
     @endphp
 
     {{-- ===================== COMPANY LETTERHEAD ===================== --}}

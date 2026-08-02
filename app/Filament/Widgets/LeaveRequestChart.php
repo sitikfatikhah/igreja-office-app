@@ -13,9 +13,9 @@ class LeaveRequestChart extends ChartWidget
 
     protected static ?int $sort = 5;
 
-    protected ?string $heading = 'Leave Request Breakdown';
+    protected ?string $heading = 'Rincian Permohonan Cuti';
 
-    protected ?string $description = 'Distribution of leave requests by approval status.';
+    protected ?string $description = 'Distribusi permohonan cuti berdasarkan status persetujuan.';
 
     protected ?string $pollingInterval = '60s';
 
@@ -54,9 +54,9 @@ class LeaveRequestChart extends ChartWidget
                 ],
             ],
             'labels' => [
-                $labelWithPercent('Pending', $pending),
-                $labelWithPercent('Approved', $approved),
-                $labelWithPercent('Rejected', $rejected),
+                $labelWithPercent('Menunggu', $pending),
+                $labelWithPercent('Disetujui', $approved),
+                $labelWithPercent('Ditolak', $rejected),
             ],
         ];
     }

@@ -13,7 +13,7 @@ class PendingApprovalWidget extends StatsOverviewWidget
 {
     protected static ?int $sort = 3;
     
-    protected ?string $heading = 'Action Center';
+    protected ?string $heading = 'Pusat Tindakan';
 
     protected function getStats(): array
     {

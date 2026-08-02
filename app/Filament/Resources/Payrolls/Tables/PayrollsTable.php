@@ -99,7 +99,10 @@ class PayrollsTable
                     ->action(function ($record) {
 
                         return Excel::download(
-                            new PayrollSlipExport($record),
+                            new PayrollSlipExport(
+                                $record,
+                                app(\App\Services\SettingsService::class)->all(auth()->user())
+                            ),
                             'Slip-Gaji-' . $record->id . '.xlsx'
                         );
                     }),

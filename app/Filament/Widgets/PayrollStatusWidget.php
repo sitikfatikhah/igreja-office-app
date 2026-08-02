@@ -147,12 +147,12 @@ class PayrollStatusWidget extends Widget
     protected function trendLabel(float $current, float $previous): string
     {
         if ($previous == 0) {
-            return $current > 0 ? 'New activity vs previous period' : 'No change vs previous period';
+            return $current > 0 ? 'Aktivitas baru dibanding periode sebelumnya' : 'Tidak ada perubahan dibanding periode sebelumnya';
         }
 
         $change = round((($current - $previous) / $previous) * 100, 1);
         $sign = $change > 0 ? '+' : '';
 
-        return "{$sign}{$change}% vs previous period";
+        return "{$sign}{$change}% dibanding periode sebelumnya";
     }
 }

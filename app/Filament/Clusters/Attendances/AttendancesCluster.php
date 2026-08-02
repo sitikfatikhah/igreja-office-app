@@ -13,5 +13,5 @@ class AttendancesCluster extends Cluster
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?string $slug = 'attendance-management';
+    protected static ?string $slug = 'Kehadiran Karyawan';
 }

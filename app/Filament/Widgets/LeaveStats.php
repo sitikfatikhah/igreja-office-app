@@ -133,11 +133,11 @@ class LeaveStats extends Widget
         $diff = round($current - $previous, 1);
 
         if ($diff == 0) {
-            return 'No change vs previous period';
+            return 'Tidak ada perubahan dibanding periode sebelumnya';
         }
 
         $sign = $diff > 0 ? '+' : '';
 
-        return "{$sign}{$diff}pp vs previous period";
+        return "{$sign}{$diff}pp dibanding periode sebelumnya";
     }
 }

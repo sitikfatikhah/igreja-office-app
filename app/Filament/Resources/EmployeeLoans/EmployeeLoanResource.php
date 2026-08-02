@@ -25,6 +25,8 @@ class EmployeeLoanResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BookOpen;
 
+    protected static ?string $navigationLabel = 'Pinjaman Karyawan';
+
     public static function form(Schema $schema): Schema
     {
         return EmployeeLoanForm::configure($schema);
@@ -33,11 +35,6 @@ class EmployeeLoanResource extends Resource
     public static function table(Table $table): Table
     {
         return EmployeeLoansTable::configure($table);
-    }
-
-    public static function getNavigationLabel(): string
-    {
-        return __('Pinjaman Karyawan');
     }
 
     public static function getModelLabel(): string

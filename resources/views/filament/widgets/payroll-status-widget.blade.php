@@ -29,7 +29,7 @@
                     </text>
                 </svg>
                 <p class="psw-text-muted" style="font-size: 12px; text-align: center; margin-top: 4px;">
-                    Payroll value<br>
+                    Nilai penggajian<br>
                     <span class="psw-text-strong" style="font-weight: 600;">Rp {{ number_format($payrollValue, 0, ',', '.') }}</span>
                 </p>
             </div>
@@ -78,7 +78,7 @@
                 <div class="psw-divider" style="display: flex; gap: 32px; margin-top: 4px; padding-top: 12px;">
                     <div>
                         <div class="psw-text-strong" style="font-size: 20px; font-weight: 600;">{{ number_format($totalPayrolls) }}</div>
-                        <div class="psw-text-muted" style="font-size: 12px;">total payrolls</div>
+                        <div class="psw-text-muted" style="font-size: 12px;">total penggajian</div>
                     </div>
                     <div>
                         <div class="psw-text-strong" style="font-size: 13px; font-weight: 600; margin-top: 2px;">{{ $payrollValueTrend }}</div>

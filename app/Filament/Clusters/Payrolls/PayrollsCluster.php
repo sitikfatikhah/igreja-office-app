@@ -13,5 +13,5 @@ class PayrollsCluster extends Cluster
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?string $navigationLabel = 'Employee Payroll';
+    protected static ?string $navigationLabel = 'Penggajian Karyawan';
 }

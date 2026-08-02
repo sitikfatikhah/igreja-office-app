@@ -29,7 +29,7 @@
                     </text>
                 </svg>
                 <p class="osw-text-muted" style="font-size: 12px; text-align: center; margin-top: 4px;">
-                    Approval rate<br>
+                    Tingkat persetujuan<br>
                     <span class="osw-text-strong" style="font-weight: 600;">{{ $approvalRateTrend }}</span>
                 </p>
             </div>

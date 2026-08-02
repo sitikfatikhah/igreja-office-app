@@ -13,5 +13,5 @@ class LeaveDepositsCluster extends Cluster
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?string $navigationLabel = 'Employee Leave';
+    protected static ?string $navigationLabel = 'Cuti Karyawan';
 }

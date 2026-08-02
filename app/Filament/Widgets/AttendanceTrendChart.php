@@ -14,9 +14,9 @@ class AttendanceTrendChart extends ChartWidget
 
     protected static ?int $sort = 5;
 
-    protected ?string $heading = 'Attendance Trend';
+    protected ?string $heading = 'Tren Kehadiran';
 
-    protected ?string $description = 'Total working days, late hours, and overtime hours over time.';
+    protected ?string $description = 'Total hari kerja, jam terlambat, dan jam lembur dari waktu ke waktu.';
 
     protected ?string $pollingInterval = '60s';
 
@@ -24,8 +24,8 @@ class AttendanceTrendChart extends ChartWidget
     protected function getFilters(): ?array
     {
         return [
-            'daily' => 'Daily (selected range)',
-            'monthly' => 'Monthly (this year)',
+            'daily' => 'Harian (rentang terpilih)',
+            'monthly' => 'Bulanan (tahun ini)',
         ];
     }
 
@@ -66,7 +66,7 @@ class AttendanceTrendChart extends ChartWidget
                     'fill' => true,
                 ],
                 [
-                    'label' => 'Absent Days',
+                    'label' => 'Hari Tidak Hadir',
                     'data' => $data->pluck('total_absent')->toArray(),
                     'borderColor' => '#f59e0b',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
@@ -145,7 +145,7 @@ class AttendanceTrendChart extends ChartWidget
                     'fill' => true,
                 ],
                 [
-                    'label' => 'Late Hours',
+                    'label' => 'Jam Terlambat',
                     'data' => $late,
                     'borderColor' => '#f59e0b',
                     'backgroundColor' => 'rgba(245, 158, 11, 0.1)',
