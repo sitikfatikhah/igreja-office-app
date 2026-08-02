@@ -24,6 +24,8 @@ class LoanInstallmentResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    protected static ?string $navigationLabel = 'Cicilan Pinjaman';
+
     public static function form(Schema $schema): Schema
     {
         return LoanInstallmentForm::configure($schema);

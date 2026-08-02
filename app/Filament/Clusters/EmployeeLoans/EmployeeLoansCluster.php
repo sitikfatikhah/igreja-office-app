@@ -13,5 +13,5 @@ class EmployeeLoansCluster extends Cluster
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
-    protected static ?string $navigationLabel = 'Pinjaman Karyawan';
+    protected static ?string $navigationLabel = 'Pinjaman';
 }

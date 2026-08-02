@@ -47,11 +47,6 @@ class EmployeeLoanResource extends Resource
         return __('Pinjaman Karyawan');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Manajemen SDM');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Pinjaman Karyawan');
