@@ -1,3 +1,3 @@
-// import './face-enrollment';
+import './face-enrollment';
 
-import './bootstrap';
+// import './bootstrap';
