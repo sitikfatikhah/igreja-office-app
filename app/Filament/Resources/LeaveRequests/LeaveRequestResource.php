@@ -34,6 +34,31 @@ class LeaveRequestResource extends Resource
         return LeaveRequestsTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Permohonan Cuti');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Permohonan Cuti');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Permohonan Cuti');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Cuti');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Permohonan Cuti');
+    }
+
     public static function getRelations(): array
     {
         return [

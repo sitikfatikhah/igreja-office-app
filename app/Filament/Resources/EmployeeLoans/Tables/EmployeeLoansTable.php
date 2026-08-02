@@ -29,22 +29,22 @@ class EmployeeLoansTable
             })
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Employee Name')
+                    ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('total_amount')
-                    ->label('Total Loan')
+                    ->label('Total Pinjaman')
                     ->money('idr', true)
                     ->sortable(),
                 TextColumn::make('installment_count')
-                    ->label('Installment Count')
+                    ->label('Jumlah Cicilan')
                     ->sortable(),
                 TextColumn::make('installment_amount')
-                    ->label('Installment Amount')
+                    ->label('Nominal Cicilan')
                     ->money('idr', true)
                     ->sortable(),
                 TextColumn::make('remaining_balance')
-                    ->label('Remaining Balance')
+                    ->label('Sisa Saldo')
                     ->money('idr', true)
                     ->sortable(),
                 TextColumn::make('start_date')

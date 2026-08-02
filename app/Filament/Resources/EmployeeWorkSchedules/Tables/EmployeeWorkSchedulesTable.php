@@ -29,13 +29,13 @@ class EmployeeWorkSchedulesTable
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('user.name')
-                    ->label('Employee')
+                    ->label('Pegawai')
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('effective_from')
                     ->date()
                     ->sortable(),
-                TextColumn::make('effective_untill')
+                TextColumn::make('effective_until')
                     ->date()
                     ->sortable(),
                 TextColumn::make('off_days')

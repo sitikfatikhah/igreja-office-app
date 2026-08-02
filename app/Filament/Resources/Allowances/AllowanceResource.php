@@ -33,6 +33,31 @@ class AllowanceResource extends Resource
         return AllowancesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Tunjangan');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Tunjangan');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Tunjangan');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Tunjangan');
+    }
+
     public static function getRelations(): array
     {
         return [

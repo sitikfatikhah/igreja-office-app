@@ -22,13 +22,13 @@ class ListPayrolls extends ListRecords
         return [
 
             CreateAction::make('generatePayroll')
-                ->label('Generate Payroll')
+                ->label('Buat Penggajian')
                 ->icon('heroicon-o-banknotes')
 
                 ->form([
 
                     Select::make('attendance_report_id')
-                        ->label('Attendance Period')
+                        ->label('Periode Kehadiran')
                         ->relationship(
                             'attendanceReport',
                             'id',
@@ -54,7 +54,7 @@ class ListPayrolls extends ListRecords
 
                     Notification::make()
                         ->success()
-                        ->title('Payroll generated successfully.')
+                        ->title('Penggajian berhasil dibuat.')
                         ->send();
                 }),
 

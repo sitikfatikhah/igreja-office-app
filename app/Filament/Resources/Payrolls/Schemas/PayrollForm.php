@@ -27,14 +27,14 @@ class PayrollForm
     {
         return $schema
             ->components([
-                Section::make('Payroll')
+                Section::make('Penggajian')
                     ->schema([
 
-                        Section::make('Attendance')
-                            ->description('Select attendance period to generate payroll.')
+                        Section::make('Kehadiran')
+                            ->description('Pilih periode kehadiran untuk menghasilkan penggajian.')
                             ->schema([
                                 Select::make('attendance_report_id')
-                                    ->label('Attendance Period')
+                                    ->label('Periode Kehadiran')
                                     ->options(
                                         AttendanceReport::with('user')
                                             ->get()
@@ -101,16 +101,16 @@ class PayrollForm
                                         $set('total_absent', $report->total_absent);
                                         $set('total_overtime', $report->total_overtime);
                                     })
-                                    ->helperText('Select an attendance period.'),
+                                    ->helperText('Pilih periode kehadiran.'),
                             ]),
 
                         Section::make('Status')
-                            ->description('Payroll status')
+                            ->description('Status penggajian')
                             ->schema([
                                 DateTimePicker::make('generated_at')
                                     ->disabled()
                                     ->dehydrated(false)
-                                    ->helperText('Payroll generation date.'),
+                                    ->helperText('Tanggal pembuatan penggajian.'),
 
                                 Select::make('status')
                                     ->options([
@@ -126,8 +126,8 @@ class PayrollForm
                     ->columns(2)
                     ->columnSpanFull(),
                      
-                   Section::make('Additional Earnings')
-                        ->description('Additional Earnings')
+                   Section::make('Tambahan Penghasilan')
+                        ->description('Tambahan penghasilan')
                         ->schema([
                             TextInput::make('deduction_total')
                                 ->numeric()
@@ -148,12 +148,12 @@ class PayrollForm
                             TextInput::make('gross_pay')
                                 ->numeric()
                                 ->readOnly()
-                                ->helperText('Total gross salary.')
+                                ->helperText('Total penghasilan kotor.')
                                 ->readOnly(),
                             TextInput::make('net_pay')
                                     ->numeric()
                                     ->readOnly()
-                                    ->helperText('Total net salary.')
+                                    ->helperText('Total penghasilan bersih.')
                                     ->readOnly(),
                         ])
                         ->columns(2)

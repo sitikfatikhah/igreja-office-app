@@ -41,6 +41,31 @@ class CompensationResource extends Resource
         return CompensationTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Kompensasi');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Kompensasi');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Kompensasi');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Kompensasi');
+    }
+
     public static function getRelations(): array
     {
         return [

@@ -41,6 +41,31 @@ class AttendanceResource extends Resource
         return AttendancesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Kehadiran');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Kehadiran');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Kehadiran');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Kehadiran');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Kehadiran');
+    }
+
     public static function getRelations(): array
     {
         return [];

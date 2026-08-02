@@ -12,30 +12,30 @@ class AllowanceForm
     {
         return $schema
             ->components([
-                TextInput::make('type')
-                    ->label('Name')
+                Select::make('type')
+                    ->label('Nama')
                     ->required()
-                    ->helperText('Enter the allowance name.'),
+                    ->helperText('Masukkan nama tunjangan.'),
 
                 TextInput::make('amount')
                     ->required()
                     ->numeric()
                     ->default(0)
-                    ->helperText('Enter the allowance amount.'),
+                    ->helperText('Masukkan nominal tunjangan.'),
 
                 TextInput::make('description')
-                    ->label('Description')
+                    ->label('Deskripsi')
                     ->columnSpanFull()
-                    ->helperText('Enter a brief description.'),
+                    ->helperText('Masukkan deskripsi singkat.'),
                 Select::make('calculation_type')
                     ->options([
-                        'fixed'=> 'Fixed',
-                        'attendance' => 'Attendance', 
-                        'overtime' => 'Overtime',
+                        'fixed'=> 'Tetap',
+                        'attendance' => 'Kehadiran', 
+                        'overtime' => 'Lembur',
                         ])
                     ->required()
                     ->columnSpanFull()
-                    ->helperText('Select Calculation Type.'),
+                    ->helperText('Pilih jenis perhitungan.'),
             ]);
     }
 }

@@ -404,6 +404,12 @@
         $attendances   = $attendances ?? collect();
         $leaveRequests = $leaveRequests ?? collect();
 
+        
+            $offDays = collect(optional($workSchedule)->off_days ?? [])
+                ->map(fn ($day) => strtolower($day))
+                ->toArray();
+        
+
         // Build the full date range from start to end (including days with no record)
         $period = collect();
         if ($startDate && $endDate) {
@@ -593,90 +599,90 @@
 
     {{-- ===================== DOCUMENT TITLE ===================== --}}
     <div class="doc-title-wrap">
-        <p class="doc-title">Employee Attendance Report</p>
+        <p class="doc-title">Laporan Kehadiran Pegawai</p>
     </div>
 
     {{-- ===================== META ===================== --}}
     <table class="meta-table">
         <tr>
-            <td class="meta-label">Report No.</td>
+            <td class="meta-label">No. Laporan</td>
             <td class="meta-colon">:</td>
             <td class="meta-value">
                 {{ $reportNumber ?? ('ATT/' . now()->format('Y/m') . '/' . str_pad($user->id ?? 0, 5, '0', STR_PAD_LEFT)) }}
             </td>
-            <td class="meta-right">Print Date: <strong>{{ now()->translatedFormat('d F Y') }}</strong></td>
+            <td class="meta-right">Tanggal Cetak: <strong>{{ now()->translatedFormat('d F Y') }}</strong></td>
         </tr>
         <tr>
-            <td class="meta-label">Period</td>
+            <td class="meta-label">Periode</td>
             <td class="meta-colon">:</td>
             <td class="meta-value">
                 {{ $startDate?->translatedFormat('d F Y') ?? '-' }} &ndash; {{ $endDate?->translatedFormat('d F Y') ?? '-' }}
             </td>
-            <td class="meta-right">Printed by: <strong>{{ auth()->user()->name ?? 'System' }}</strong></td>
+            <td class="meta-right">Dicetak oleh: <strong>{{ auth()->user()->name ?? 'Sistem' }}</strong></td>
         </tr>
     </table>
 
     {{-- ===================== EMPLOYEE INFORMATION ===================== --}}
-    <div class="section-heading">Employee Information</div>
+    <div class="section-heading">Informasi Pegawai</div>
     <table class="info-table">
         <tr>
-            <td class="label-col">Employee Name</td>
+            <td class="label-col">Nama Pegawai</td>
             <td class="value-col">{{ $user->name ?? '-' }}</td>
             <td class="label-col">NIP</td>
             <td class="value-col">{{ $user->nip ?? '-' }}</td>
         </tr>
         <tr>
-            <td class="label-col">Position</td>
+            <td class="label-col">Jabatan</td>
             <td class="value-col">{{ $user->position ?? '-' }}</td>
-            <td class="label-col">Department</td>
+            <td class="label-col">Departemen</td>
             <td class="value-col">{{ $user->department ?? '-' }}</td>
         </tr>
     </table>
 
     {{-- ===================== ATTENDANCE SUMMARY ===================== --}}
-    <div class="section-heading">Attendance Summary</div>
+    <div class="section-heading">Ringkasan Kehadiran</div>
     <table class="summary-table cols-6">
         <tr>
             <td>
                 <div class="summary-card info">
                     <span class="summary-value">{{ $totalHariKerja }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">Working Days</span>
+                    <span class="summary-label">Hari Kerja</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card success">
                     <span class="summary-value">{{ $totalHadir }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">Present</span>
+                    <span class="summary-label">Hadir</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card purple">
                     <span class="summary-value">{{ $totalCuti }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">Leave</span>
+                    <span class="summary-label">Cuti</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card danger">
                     <span class="summary-value">{{ $totalTidakHadir }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">Absent</span>
+                    <span class="summary-label">Tidak Hadir</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card gray">
                     <span class="summary-value">{{ $totalOffDay }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">Off Day</span>
+                    <span class="summary-label">Hari Libur</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card">
                     <span class="summary-value">{{ $totalLiburNasional }}</span>
                     <span class="summary-unit">days</span>
-                    <span class="summary-label">National Holidays</span>
+                    <span class="summary-label">Hari Libur Nasional</span>
                 </div>
             </td>
         </tr>
@@ -688,21 +694,21 @@
                 <div class="summary-card">
                     <span class="summary-value">{{ number_format($totalJamKerja, 1) }}</span>
                     <span class="summary-unit">hours</span>
-                    <span class="summary-label">Total Working Hours</span>
+                    <span class="summary-label">Total Jam Kerja</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card warning">
                     <span class="summary-value">{{ number_format($totalLembur, 1) }}</span>
                     <span class="summary-unit">hours</span>
-                    <span class="summary-label">Total Overtime</span>
+                    <span class="summary-label">Total Lembur</span>
                 </div>
             </td>
             <td>
                 <div class="summary-card danger">
                     <span class="summary-value">{{ number_format($totalTelat, 1) }}</span>
                     <span class="summary-unit">hours</span>
-                    <span class="summary-label">Total Late Hours</span>
+                    <span class="summary-label">Total Jam Terlambat</span>
                 </div>
             </td>
             <td>
@@ -711,35 +717,31 @@
                         {{ $totalHariKerja > 0 ? number_format(min(100, ($totalHadir / $totalHariKerja) * 100), 1) : 0 }}%
                     </span>
                     <span class="summary-unit">&nbsp;</span>
-                    <span class="summary-label">Attendance Rate</span>
+                    <span class="summary-label">Tingkat Kehadiran</span>
                 </div>
             </td>
         </tr>
     </table>
 
     {{-- ===================== DAILY DETAILS ===================== --}}
-    <div class="section-heading">Daily Attendance Details</div>
+    <div class="section-heading">Detail Kehadiran Harian</div>
     <table class="detail-table">
         <thead>
             <tr>
                 <th style="width: 4%;">No</th>
-                <th style="width: 9%;">Date</th>
-                <th style="width: 7%;">Day</th>
-                <th style="width: 8%;">Check In</th>
-                <th style="width: 8%;">Check Out</th>
-                <th style="width: 8%;">Working Hours</th>
-                <th style="width: 8%;">Overtime</th>
-                <th style="width: 7%;">Late (hrs)</th>
+                <th style="width: 9%;">Tanggal</th>
+                <th style="width: 7%;">Hari</th>
+                <th style="width: 8%;">Masuk</th>
+                <th style="width: 8%;">Pulang</th>
+                <th style="width: 8%;">Jam Kerja</th>
+                <th style="width: 8%;">Lembur</th>
+                <th style="width: 7%;">Terlambat (jam)</th>
                 <th style="width: 9%;">Status</th>
-                <th style="width: 32%;">Remarks</th>
+                <th style="width: 32%;">Catatan</th>
             </tr>
         </thead>
         <tbody>
-            @php
-                $offDays = collect($workSchedule->off_days ?? [])
-                    ->map(fn ($day) => strtolower($day))
-                    ->toArray();
-            @endphp
+            
             @forelse ($period as $i => $day)
                 @php
                     $key = $day->format('Y-m-d');
@@ -772,12 +774,12 @@
 
                     @if ($isHoliday)
                         <td colspan="5" class="text-left">
-                            <span class="badge badge-info">NATIONAL HOLIDAY</span>
+                            <span class="badge badge-info">LIBUR NASIONAL</span>
                             <span class="holiday-note">{{ $holidays[$key] }}</span>
                         </td>
                     @elseif ($leave)
                         <td colspan="5" class="text-left">
-                            <span class="badge badge-purple">LEAVE &ndash; {{ $leave->leave_type }}</span>
+                            <span class="badge badge-purple">CUTI &ndash; {{ $leave->leave_type }}</span>
                             @if (!empty($leave->reason))
                                 <span class="leave-note">{{ $leave->reason }}</span>
                             @endif
@@ -790,9 +792,9 @@
                         <td>{{ $att->is_late ? number_format($att->late_hours ?? 0, 1) : '-' }}</td>
                         <td>
                             @if ($att->is_late)
-                                <span class="badge badge-warning">Late</span>
+                                <span class="badge badge-warning">Terlambat</span>
                             @else
-                                <span class="badge badge-success">On Time</span>
+                                <span class="badge badge-success">Tepat Waktu</span>
                             @endif
                         </td>
                         <td class="text-left">
@@ -800,14 +802,14 @@
                         </td>
                     @elseif ($isOffDay)
                         <td colspan="5" class="text-left">
-                            <span class="badge badge-secondary">OFF DAY</span>
+                            <span class="badge badge-secondary">HARI LIBUR</span>
                         </td>
                         <td class="text-left">
-                            Scheduled Off Day ({{ $day->englishDayOfWeek }})
+                            Hari libur terjadwal ({{ $day->englishDayOfWeek }})
                         </td>
                     @else
                         <td colspan="5" class="text-left">
-                            <span class="badge badge-danger">ABSENT</span>
+                            <span class="badge badge-danger">TIDAK HADIR</span>
                         </td>
                         <td class="text-left">No remarks</td>
                     @endif
@@ -822,21 +824,20 @@
 
     {{-- ===================== LEGEND ===================== --}}
     <div class="legend-box">
-        <span><span class="legend-dot" style="background:#eef2fb;"></span>National Holiday</span>
-        <span><span class="legend-dot" style="background:#f3eefc;"></span>Leave</span>
-        <span><span class="legend-dot" style="background:#f5f5f7;"></span>Off Day</span>
-        <span><span class="legend-dot" style="background:#fdecea;"></span>Absent</span>
-        <span><span class="badge badge-warning" style="margin-right:3px;">&nbsp;</span>Late</span>
-        <span><span class="badge badge-success" style="margin-right:3px;">&nbsp;</span>On Time</span>
+        <span><span class="legend-dot" style="background:#eef2fb;"></span>Libur Nasional</span>
+        <span><span class="legend-dot" style="background:#f3eefc;"></span>Cuti</span>
+        <span><span class="legend-dot" style="background:#f5f5f7;"></span>Hari Libur</span>
+        <span><span class="legend-dot" style="background:#fdecea;"></span>Tidak Hadir</span>
+        <span><span class="badge badge-warning" style="margin-right:3px;">&nbsp;</span>Terlambat</span>
+        <span><span class="badge badge-success" style="margin-right:3px;">&nbsp;</span>Tepat Waktu</span>
     </div>
 
     {{-- ===================== NOTE ===================== --}}
     <div class="legend-box" style="margin-top: 10px;">
-        <strong>Note:</strong> This report is generated automatically by the system based on recorded attendance
-        and approved leave data. A 6-working-day calendar week is applied: every calendar week only requires
-        6 working days regardless of which specific day ends up being the day off (weeks that already contain a
-        national holiday do not get an additional off day on top of it). Working hours, overtime, and lateness
-        are calculated according to the company's applicable policy.
+        <strong>Catatan:</strong> Laporan ini dibuat otomatis oleh sistem berdasarkan catatan kehadiran
+        dan data cuti yang telah disetujui. Penerapan minggu kerja 6 hari berlaku: setiap minggu kerja hanya membutuhkan
+        6 hari kerja terlepas dari hari tertentu yang menjadi hari libur (minggu yang sudah memuat hari libur nasional
+        tidak mendapatkan hari libur tambahan di atasnya). Jam kerja, lembur, dan keterlambatan dihitung sesuai kebijakan perusahaan yang berlaku.
     </div>
 
     {{-- ===================== SIGNATURE ===================== --}}
@@ -847,13 +848,13 @@
                     <div class="signature-place-date">
                         {{ $instansi->city ?? 'Tangerang' }}, {{ now()->translatedFormat('d F Y') }}
                     </div>
-                    <div>Reviewed by,</div>
+                    <div>Ditinjau oleh,</div>
                     <div class="signature-name">{{ $reviewedBy ?? 'HR Staff' }}</div>
-                    <div class="signature-position">Human Resources Department</div>
+                    <div class="signature-position">Departemen Sumber Daya Manusia</div>
                 </td>
                 <td>
                     <div class="signature-place-date">&nbsp;</div>
-                    <div>Acknowledged by,</div>
+                    <div>Disetujui oleh,</div>
                     <div class="signature-name">{{ $user->name ?? '-' }}</div>
                     <div class="signature-position">{{ $user->position ?? 'Employee' }}</div>
                 </td>
@@ -863,8 +864,8 @@
 
     {{-- ===================== FOOTER ===================== --}}
     <div class="footer">
-        This document was generated automatically by the {{ $instansi->name ?? config('app.name') }} attendance system &mdash;
-        Printed on {{ now()->translatedFormat('d F Y, H:i') }} WIB (Western Indonesia Time)
+        Dokumen ini dibuat otomatis oleh sistem kehadiran {{ $instansi->name ?? config('app.name') }} &mdash;
+        Dicetak pada {{ now()->translatedFormat('d F Y, H:i') }} WIB
     </div>
 
 </div>

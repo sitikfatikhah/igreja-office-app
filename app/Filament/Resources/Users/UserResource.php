@@ -38,6 +38,31 @@ class UserResource extends Resource
         return UsersTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Pegawai');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Pegawai');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Pegawai');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Manajemen SDM');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Pegawai');
+    }
+
     public static function getRelations(): array
     {
         return [

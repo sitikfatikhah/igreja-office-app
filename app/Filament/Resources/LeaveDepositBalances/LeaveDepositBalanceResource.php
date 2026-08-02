@@ -34,6 +34,31 @@ class LeaveDepositBalanceResource extends Resource
         return LeaveDepositBalancesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Saldo Deposit Cuti');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Saldo Deposit Cuti');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Saldo Deposit Cuti');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Cuti');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Saldo Deposit Cuti');
+    }
+
     public static function getRelations(): array
     {
         return [

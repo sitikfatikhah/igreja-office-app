@@ -31,6 +31,31 @@ class EmployeeWorkScheduleResource extends Resource
         return EmployeeWorkSchedulesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Jadwal Kerja');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Jadwal Kerja');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Jadwal Kerja');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Manajemen SDM');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Jadwal Kerja');
+    }
+
     public static function getRelations(): array
     {
         return [

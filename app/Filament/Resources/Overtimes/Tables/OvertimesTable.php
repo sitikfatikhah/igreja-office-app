@@ -42,20 +42,20 @@ class OvertimesTable
             ->columns([
                 TextColumn::make('id')->label('ID'),
                 TextColumn::make('user.nip')->label('NIP'),
-                TextColumn::make('user.name')->label('Employee Name'),
-                TextColumn::make('position')->label('Position'),
-                TextColumn::make('overtime_date')->date()->label('Overtime Date'),
-                TextColumn::make('start_time')->time()->label('Start Time'),
-                TextColumn::make('end_time')->time()->label('End Time'),
-                TextColumn::make('total_hours')->label('Total Hours'),
-                TextColumn::make('description')->label('Description'),
-                TextColumn::make('approval_status')->label('Approval Status'),
-                TextColumn::make('approved_by')->label('Approved By'),
-                TextColumn::make('reason')->label('Reason'),
+                TextColumn::make('user.name')->label('Nama Pegawai'),
+                TextColumn::make('position')->label('Jabatan'),
+                TextColumn::make('overtime_date')->date()->label('Tanggal Lembur'),
+                TextColumn::make('start_time')->time()->label('Waktu Mulai'),
+                TextColumn::make('end_time')->time()->label('Waktu Selesai'),
+                TextColumn::make('total_hours')->label('Total Jam'),
+                TextColumn::make('description')->label('Deskripsi'),
+                TextColumn::make('approval_status')->label('Status Persetujuan'),
+                TextColumn::make('approved_by')->label('Disetujui Oleh'),
+                TextColumn::make('reason')->label('Alasan'),
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Employee')
+                    ->label('Pegawai')
                     ->options(
                         User::query()
                             ->get()
@@ -73,9 +73,9 @@ class OvertimesTable
                     ->label('Tanggal')
                     ->form([
                         DatePicker::make('from')
-                        ->label('from'),
+                        ->label('Dari'),
                         DatePicker::make('until')
-                        ->label('to')
+                        ->label('Sampai')
                     ])
                     ->query(function(Builder $query, array $data){
                         return $query
@@ -94,7 +94,7 @@ class OvertimesTable
             ->recordActions([
                 EditAction::make(),
                 Action::make('approve')
-                    ->label('Approve')
+                    ->label('Setujui')
                     ->color('success')
                     ->icon('heroicon-o-check-circle')
                     ->action(function (Overtimes $overtime) {
@@ -118,7 +118,7 @@ class OvertimesTable
                     }),
                     
                 Action::make('reject')
-                    ->label('Reject')
+                    ->label('Tolak')
                     ->color('danger')
                     ->icon('heroicon-o-x-circle')
                     ->action(function (Overtimes $overtime) {

@@ -37,19 +37,19 @@ class AttendancesTable
             })
             ->columns([
                 TextColumn::make('id')->sortable(),
-                TextColumn::make('user.name')->label('User')->sortable()->searchable(),
-                TextColumn::make('user.position')->label('Position')->sortable()->searchable(),
+                TextColumn::make('user.name')->label('Pegawai')->sortable()->searchable(),
+                TextColumn::make('user.position')->label('Jabatan')->sortable()->searchable(),
                 TextColumn::make('user.nip')->label('NIP')->sortable()->searchable(),
-                ImageColumn::make('photo')->label('Photo')->disk('public'),
-                TextColumn::make('verification_method')->label('Verification Method')->sortable()->searchable(),
+                ImageColumn::make('photo')->label('Foto')->disk('public'),
+                TextColumn::make('verification_method')->label('Metode Verifikasi')->sortable()->searchable(),
                 TextColumn::make('check_in')->dateTime()->sortable(),
                 TextColumn::make('check_out')->dateTime()->sortable(),
-                TextColumn::make('check_in_latitude')->label('Check-in Latitude')->sortable()->searchable(),
-                TextColumn::make('check_in_longitude')->label('Check-in Longitude')->sortable()->searchable(),
-                TextColumn::make('check_out_latitude')->label('Check-out Latitude')->sortable()->searchable(),
-                TextColumn::make('check_out_longitude')->label('Check-out Longitude')->sortable()->searchable(),
-                TextColumn::make('check_in_location_name')->label('Check-in Location')->sortable()->searchable(),
-                TextColumn::make('check_out_location_name')->label('Check-out Location')->sortable()->searchable(),
+                TextColumn::make('check_in_latitude')->label('Lintang Masuk')->sortable()->searchable(),
+                TextColumn::make('check_in_longitude')->label('Bujur Masuk')->sortable()->searchable(),
+                TextColumn::make('check_out_latitude')->label('Lintang Pulang')->sortable()->searchable(),
+                TextColumn::make('check_out_longitude')->label('Bujur Pulang')->sortable()->searchable(),
+                TextColumn::make('check_in_location_name')->label('Lokasi Masuk')->sortable()->searchable(),
+                TextColumn::make('check_out_location_name')->label('Lokasi Pulang')->sortable()->searchable(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -61,7 +61,7 @@ class AttendancesTable
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Employee')
+                    ->label('Pegawai')
                     ->options(
                         User::query()
                             ->get()
@@ -79,9 +79,9 @@ class AttendancesTable
                     ->label('Tanggal')
                     ->form([
                         DatePicker::make('from')
-                        ->label('from'),
+                        ->label('Dari'),
                         DatePicker::make('until')
-                        ->label('to')
+                        ->label('Sampai')
                     ])
                     ->query(function(Builder $query, array $data){
                         return $query

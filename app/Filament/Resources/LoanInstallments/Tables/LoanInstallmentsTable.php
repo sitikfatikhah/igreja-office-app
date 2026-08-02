@@ -26,10 +26,10 @@ class LoanInstallmentsTable
                 return $query->where('user_id', $user->id);
             })
             ->columns([
-                TextColumn::make('employeeLoan.user.name')->label('Employee Name'),
-                TextColumn::make('employeeLoan.total_amount')->label('Total Loan'),
-                TextColumn::make('amount')->label('Installment Amount'),
-                TextColumn::make('deducted_at')->label('Deducted At'),
+                TextColumn::make('employeeLoan.user.name')->label('Nama Pegawai'),
+                TextColumn::make('employeeLoan.total_amount')->label('Total Pinjaman'),
+                TextColumn::make('amount')->label('Nominal Cicilan'),
+                TextColumn::make('deducted_at')->label('Tanggal Dipotong'),
             ])
             ->filters([
                 //

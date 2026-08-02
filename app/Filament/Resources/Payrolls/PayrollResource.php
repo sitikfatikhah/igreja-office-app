@@ -35,6 +35,31 @@ class PayrollResource extends Resource
         return PayrollsTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Penggajian');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Penggajian');
+    }
+
     public static function getRelations(): array
     {
         return [

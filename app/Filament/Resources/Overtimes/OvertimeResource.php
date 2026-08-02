@@ -35,6 +35,31 @@ class OvertimeResource extends Resource
         return OvertimesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Lembur');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Lembur');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Lembur');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Kehadiran');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Lembur');
+    }
+
     public static function getRelations(): array
     {
         return [

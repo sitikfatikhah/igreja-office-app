@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->bigInteger('user_id')->cascade()->onDelete();
             $table->date('effective_from');
-            $table->date('effective_untill');
+            $table->date('effective_until')->nullable();
             $table->json('off_days');
             $table->string('remarks')->nullable();
             $table->timestamps();

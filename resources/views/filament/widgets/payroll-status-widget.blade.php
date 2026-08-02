@@ -1,10 +1,10 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <x-slot name="heading">
-            Payroll Status Overview
+            Ringkasan Status Penggajian
         </x-slot>
         <x-slot name="description">
-            An overview of payroll status.
+            Gambaran umum status penggajian.
         </x-slot>
 
         <div class="payroll-stats-widget" style="display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center;">
@@ -25,7 +25,7 @@
                         {{ $paidRate }}%
                     </text>
                     <text x="80" y="96" text-anchor="middle" font-size="11" class="psw-text-muted">
-                        paid
+                        dibayar
                     </text>
                 </svg>
                 <p class="psw-text-muted" style="font-size: 12px; text-align: center; margin-top: 4px;">
@@ -40,7 +40,7 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="psw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-clock style="width: 16px; height: 16px; color: #f59e0b;" />
-                            Draft
+                            Draf
                         </span>
                         <span class="psw-text-strong" style="font-weight: 600;">{{ number_format($draft) }}</span>
                     </div>
@@ -53,7 +53,7 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="psw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-document-check style="width: 16px; height: 16px; color: #3b82f6;" />
-                            Generated
+                            Dibuat
                         </span>
                         <span class="psw-text-strong" style="font-weight: 600;">{{ number_format($generated) }}</span>
                     </div>
@@ -66,7 +66,7 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="psw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-check-circle style="width: 16px; height: 16px; color: #10b981;" />
-                            Paid
+                            Dibayar
                         </span>
                         <span class="psw-text-strong" style="font-weight: 600;">{{ number_format($paid) }}</span>
                     </div>
@@ -82,7 +82,7 @@
                     </div>
                     <div>
                         <div class="psw-text-strong" style="font-size: 13px; font-weight: 600; margin-top: 2px;">{{ $payrollValueTrend }}</div>
-                        <div class="psw-text-muted" style="font-size: 12px;">paid value trend</div>
+                        <div class="psw-text-muted" style="font-size: 12px;">tren nilai dibayar</div>
                     </div>
                 </div>
 

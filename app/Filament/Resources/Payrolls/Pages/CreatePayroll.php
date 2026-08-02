@@ -16,20 +16,11 @@ class CreatePayroll extends CreateRecord
 
     protected static ?string $cluster = PayrollsCluster::class;
 
-    protected function mutateFormDataBeforeCreate(array $data): array
+    protected function handleRecordCreation(array $data): Payrolls
     {
         $report = AttendanceReport::findOrFail($data['attendance_report_id']);
 
-        // Generate payroll via service to ensure calculations and details
-        // are centralized in App\Services\PayrollService.
-        app(PayrollService::class)->generate($report);
-
-        // Prevent the default record creation by returning an empty payload
-        // and redirecting to index (service already persisted payroll).
-        $this->redirect(self::getUrl('index'));
-        $this->halt();
-
-        return [];
+        return app(PayrollService::class)->generate($report);
     }
 
     #[Override]

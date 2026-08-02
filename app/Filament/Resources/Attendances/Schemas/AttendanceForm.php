@@ -14,20 +14,20 @@ class AttendanceForm
     {
         return $schema
             ->components([
-                Section::make('Attendance Verification')
-                    ->description('Allow camera and location access, then verify your face to complete attendance.')
+                Section::make('Verifikasi Kehadiran')
+                    ->description('Izinkan akses kamera dan lokasi, lalu verifikasi wajah Anda untuk menyelesaikan kehadiran.')
                     ->schema([
                         TextInput::make('nip')
                             ->label('NIP')
                             ->default(fn () => auth()->user()?->nip)
                             ->disabled()
-                            ->helperText('Employee ID number.'),
+                            ->helperText('Nomor identitas pegawai.'),
 
                         TextInput::make('position')
-                            ->label('Position')
+                            ->label('Jabatan')
                             ->default(fn () => auth()->user()?->position)
                             ->disabled()
-                            ->helperText('Current job position.'),
+                            ->helperText('Jabatan kerja saat ini.'),
 
                         View::make('filament.forms.face-attendance-script')
                             ->columnSpanFull(),

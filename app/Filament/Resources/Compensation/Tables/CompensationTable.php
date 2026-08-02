@@ -23,19 +23,19 @@ class CompensationTable
             ->striped()
             ->columns([
                 TextColumn::make('basic_salary')
-                    ->label('Basic Salary')
+                    ->label('Gaji Pokok')
                     ->money('idr', true),
                 TextColumn::make('effective_date')
-                    ->label('Effective Date')
+                    ->label('Tanggal Berlaku')
                     ->date('M j, Y'),
                 IconColumn::make('is_active')
-                    ->label('Is Active')
+                    ->label('Aktif')
                     ->boolean()
                     ->trueColor('info')
                     ->falseColor('warning')
                     ->label('Is Active'),
                 TextColumn::make('notes')
-                    ->label('Notes')
+                    ->label('Catatan')
                     ->wrap(),
             ])
             ->filters([

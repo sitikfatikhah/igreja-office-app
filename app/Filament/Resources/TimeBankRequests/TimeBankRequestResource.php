@@ -34,6 +34,31 @@ class TimeBankRequestResource extends Resource
         return TimeBankRequestsTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Permohonan Time Bank');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Permohonan Time Bank');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Permohonan Time Bank');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Cuti');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Permohonan Time Bank');
+    }
+
     public static function getRelations(): array
     {
         return [

@@ -20,29 +20,30 @@ class UsersTable
         ->striped()
             ->columns([
                 TextColumn::make('id')
-                    ->label('User Id')
+                    ->label('ID')
                     ->searchable(),
                 TextColumn::make('name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('Email')
                     ->searchable(),
                 TextColumn::make('position')
-                    ->label('Position')
+                    ->label('Jabatan')
                     ->sortable(),
                 TextColumn::make('allowance.type')
-                    ->label('Allowance Type'),
+                    ->label('Jenis Tunjangan'),
                 TextColumn::make('allowance.amount')
-                    ->label('Allowance Amount')
+                    ->label('Nominal Tunjangan')
                     ->money('IDR'),
                 TextColumn::make('compensation.basic_salary')
-                    ->label('Basic Salary')
+                    ->label('Gaji Pokok')
                     ->money('IDR'),
                 TextColumn::make('nip')
                     ->label('NIP')
                     ->sortable(),
                 TextColumn::make('department')
-                    ->label('Department')
+                    ->label('Departemen')
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()

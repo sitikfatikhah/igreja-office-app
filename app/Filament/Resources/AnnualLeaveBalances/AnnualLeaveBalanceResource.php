@@ -34,6 +34,31 @@ class AnnualLeaveBalanceResource extends Resource
         return AnnualLeaveBalancesTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Saldo Cuti Tahunan');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('Saldo Cuti Tahunan');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('Saldo Cuti Tahunan');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Cuti');
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return __('Saldo Cuti Tahunan');
+    }
+
     public static function getRelations(): array
     {
         return [

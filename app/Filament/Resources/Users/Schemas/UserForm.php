@@ -18,22 +18,22 @@ class UserForm
             ->components([
                 TextInput::make('name')
                     ->required()
-                    ->helperText('Enter the user\'s full name.'),
+                    ->helperText('Masukkan nama lengkap pegawai.'),
 
                 TextInput::make('email')
                     ->label('Email')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true)
-                    ->helperText('Enter a valid email address.'),
+                    ->helperText('Masukkan alamat email yang valid.'),
 
                 TextInput::make('nip')
                     ->label('NIP')
                     ->required()
-                    ->helperText('Enter the employee ID number.'),
+                    ->helperText('Masukkan nomor identitas pegawai.'),
 
                 Select::make('position')
-                    ->label('Position')
+                    ->label('Jabatan')
                     ->required()
                     ->options([
                         'Manager' => 'Manager',
@@ -42,10 +42,10 @@ class UserForm
                         'Supervisor' => 'Supervisor',
                         'Director' => 'Director',
                     ])
-                    ->helperText('Select the employee\'s position.'),
+                    ->helperText('Pilih jabatan pegawai.'),
 
                 Select::make('department')
-                    ->label('Department')
+                    ->label('Departemen')
                     ->options([
                         'HR' => 'HR',
                         'IT' => 'IT',
@@ -54,31 +54,31 @@ class UserForm
                         'Operations' => 'Operations',
                     ])
                     ->required()
-                    ->helperText('Select the employee\'s department.'),
+                    ->helperText('Pilih departemen pegawai.'),
                 
                 
                 Select::make('compensation_id')
                     ->relationship('compensation', 'basic_salary')
-                    ->label('Compensation')
+                    ->label('Kompensasi')
                     ->preload()
                     ->searchable()
-                    ->helperText('Employee Compensation'),
+                    ->helperText('Kompensasi pegawai.'),
 
                 TextInput::make('password')
                     ->password()
                     ->required()
                     ->revealable()
-                    ->helperText('Create a secure password.'),
+                    ->helperText('Buat kata sandi yang aman.'),
                 CheckboxList::make('allowance')
                     ->relationship('allowance', 'type')
-                    ->label('Allowance')
+                    ->label('Tunjangan')
                     ->searchable()
-                    ->helperText('Select one or more Allowance'),
+                    ->helperText('Pilih satu atau lebih tunjangan.'),
 
                 CheckboxList::make('roles')
                     ->relationship('roles', 'name')
                     ->searchable()
-                    ->helperText('Select one or more roles.'),
+                    ->helperText('Pilih satu atau lebih peran.'),
 
                 
                 

@@ -29,26 +29,26 @@ class LeaveDepositBalancesTable
             })
             ->columns([
                 TextColumn::make('id'),
-                TextColumn::make('user.name'),
+                TextColumn::make('user.name')->label('Nama Pegawai'),
                 TextColumn::make('time_bank_request_id')
-                    ->label('Request Id')
+                    ->label('ID Permohonan')
                     ->searchable(),
                 TextColumn::make('days')
-                    ->label('Days')
+                    ->label('Hari')
                     ->searchable(),
                 TextColumn::make('type')
-                    ->label('Type')
+                    ->label('Jenis')
                     ->searchable(),
                 TextColumn::make('balanced')
-                    ->label('Balanced')
+                    ->label('Saldo')
                     ->searchable(),
                 TextColumn::make('description')
-                    ->label('Description')              
+                    ->label('Deskripsi')              
 
             ])
             ->filters([
                 SelectFilter::make('user_id')
-                    ->label('Employee')
+                    ->label('Pegawai')
             ])
             ->recordActions([
                 EditAction::make(),

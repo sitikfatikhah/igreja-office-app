@@ -22,7 +22,7 @@ class EmployeeWorkScheduleForm
                     ->required()
                     ->helperText('Choose employee.'),
                 DatePicker::make('effective_from'),
-                DatePicker::make('effective_untill'),
+                DatePicker::make('effective_until'),
                 Select::make('off_days')
                     ->multiple()
                     ->options([

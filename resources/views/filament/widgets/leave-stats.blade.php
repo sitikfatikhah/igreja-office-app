@@ -1,10 +1,10 @@
 <x-filament-widgets::widget>
     <x-filament::section>
         <x-slot name="heading">
-            Leave Analytics
+            Analitik Cuti
         </x-slot>
         <x-slot name="description">
-            An overview of leave analytics.
+            Gambaran umum analitik cuti.
         </x-slot>
 
         <div class="leave-stats-widget" style="display: grid; grid-template-columns: 180px 1fr; gap: 24px; align-items: center;">
@@ -25,7 +25,7 @@
                         {{ $approvalRate }}%
                     </text>
                     <text x="80" y="96" text-anchor="middle" font-size="11" class="lsw-text-muted">
-                        approved
+                        disetujui
                     </text>
                 </svg>
                 <p class="lsw-text-muted" style="font-size: 12px; text-align: center; margin-top: 4px;">
@@ -40,9 +40,9 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="lsw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-clock style="width: 16px; height: 16px; color: #f59e0b;" />
-                            Pending
+                            Menunggu
                         </span>
-                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($pendingRequests) }} requests</span>
+                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($pendingRequests) }} permohonan</span>
                     </div>
                     <div class="lsw-track" style="height: 8px; border-radius: 4px; overflow: hidden;">
                         <div style="height: 100%; width: {{ $pendingPercent }}%; background: #f59e0b; border-radius: 4px;"></div>
@@ -53,9 +53,9 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="lsw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-check-circle style="width: 16px; height: 16px; color: #10b981;" />
-                            Approved
+                            Disetujui
                         </span>
-                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($approvedRequests) }} requests</span>
+                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($approvedRequests) }} permohonan</span>
                     </div>
                     <div class="lsw-track" style="height: 8px; border-radius: 4px; overflow: hidden;">
                         <div style="height: 100%; width: {{ $approvedPercent }}%; background: #10b981; border-radius: 4px;"></div>
@@ -66,9 +66,9 @@
                     <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                         <span class="lsw-text-muted" style="display: inline-flex; align-items: center; gap: 4px;">
                             <x-heroicon-o-x-circle style="width: 16px; height: 16px; color: #ef4444;" />
-                            Rejected
+                            Ditolak
                         </span>
-                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($rejectedRequests) }} requests</span>
+                        <span class="lsw-text-strong" style="font-weight: 600;">{{ number_format($rejectedRequests) }} permohonan</span>
                     </div>
                     <div class="lsw-track" style="height: 8px; border-radius: 4px; overflow: hidden;">
                         <div style="height: 100%; width: {{ $rejectedPercent }}%; background: #ef4444; border-radius: 4px;"></div>
@@ -78,11 +78,11 @@
                 <div class="lsw-divider" style="display: flex; gap: 32px; margin-top: 4px; padding-top: 12px;">
                     <div>
                         <div class="lsw-text-strong" style="font-size: 20px; font-weight: 600;">{{ number_format($totalRequests) }}</div>
-                        <div class="lsw-text-muted" style="font-size: 12px;">total requests</div>
+                        <div class="lsw-text-muted" style="font-size: 12px;">total permohonan</div>
                     </div>
                     <div>
                         <div class="lsw-text-strong" style="font-size: 20px; font-weight: 600;">{{ number_format($totalLeaveDays) }}</div>
-                        <div class="lsw-text-muted" style="font-size: 12px;">leave days</div>
+                        <div class="lsw-text-muted" style="font-size: 12px;">hari cuti</div>
                     </div>
                 </div>
 

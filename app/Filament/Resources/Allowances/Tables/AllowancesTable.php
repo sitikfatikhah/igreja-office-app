@@ -18,7 +18,7 @@ class AllowancesTable
             ->striped()
             ->columns([
                 TextColumn::make('type')
-                    ->label('Name')
+                    ->label('Nama')
                     ->searchable(),
                 TextColumn::make('amount')
                     ->money('idr', true)

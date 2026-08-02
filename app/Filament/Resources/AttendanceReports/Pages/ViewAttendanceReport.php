@@ -40,19 +40,17 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
 
     protected string $view = 'filament.pages.view-attendance-report';
 
-    protected Collection $workSchedules;
+    protected ?Collection $workSchedules = null;
     
     
     public function mount($record): void
     {
         parent::mount($record);
 
-        $this->workSchedules = EmployeeWorkSchedule::where(
-            'user_id',
-            $this->record->user_id
-        )
-        ->orderBy('effective_from')
-        ->get();
+        $this->workSchedules = EmployeeWorkSchedule::query()
+            ->where('user_id', $this->record->user_id)
+            ->orderByDesc('effective_from')
+            ->get();
     }
 
     /**
@@ -166,9 +164,9 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
             ->whereDate('effective_from','<=',$record->end_date)
             ->where(function($query) use ($record){
 
-                $query->whereNull('effective_untill')
+                $query->whereNull('effective_until')
                     ->orWhereDate(
-                        'effective_untill',
+                        'effective_until',
                         '>=',
                         $record->start_date
                     );
@@ -182,23 +180,30 @@ class ViewAttendanceReport extends ViewRecord implements HasTable, HasSchemas, H
     {
         $date = Carbon::parse($date);
 
+        // Jika property belum diinisialisasi (Livewire)
+        if ($this->workSchedules === null) {
+            $this->workSchedules = EmployeeWorkSchedule::query()
+                ->where('user_id', $this->record->user_id)
+                ->orderByDesc('effective_from')
+                ->get();
+        }
+
         return $this->workSchedules
-            ->filter(function ($schedule) use ($date) {
+            ->filter(function (EmployeeWorkSchedule $schedule) use ($date) {
 
                 if (Carbon::parse($schedule->effective_from)->gt($date)) {
                     return false;
                 }
 
                 if (
-                    $schedule->effective_untill &&
-                    Carbon::parse($schedule->effective_untill)->lt($date)
+                    !empty($schedule->effective_until) &&
+                    Carbon::parse($schedule->effective_until)->lt($date)
                 ) {
                     return false;
                 }
 
                 return true;
             })
-            ->sortByDesc('effective_from')
             ->first();
     }
 

@@ -25,17 +25,17 @@ class AnnualLeaveBalancesTable
                 return $query->where('user_id', $user->id);
             })
             ->columns([
-                TextColumn::make('user.name')->label('Employee Name'),
-                TextColumn::make('leave_request.request_date')->label('Request Date'),
-                TextColumn::make('year')->label('Year'),
-                TextColumn::make('days')->label('Days'),
-                TextColumn::make('type')->label('Type'),
-                TextColumn::make('leave_type')->label('Leave Type'),
-                TextColumn::make('balanced')->label('Balanced'),
-                TextColumn::make('source')->label('Source'),
-                TextColumn::make('description')->label('Description'),
-                TextColumn::make('created_at')->label('Created At')->dateTime(),
-                TextColumn::make('updated_at')->label('Updated At')->dateTime(),
+                TextColumn::make('user.name')->label('Nama Pegawai'),
+                TextColumn::make('leave_request.request_date')->label('Tanggal Permohonan'),
+                TextColumn::make('year')->label('Tahun'),
+                TextColumn::make('days')->label('Hari'),
+                TextColumn::make('type')->label('Jenis'),
+                TextColumn::make('leave_type')->label('Jenis Cuti'),
+                TextColumn::make('balanced')->label('Saldo'),
+                TextColumn::make('source')->label('Sumber'),
+                TextColumn::make('description')->label('Deskripsi'),
+                TextColumn::make('created_at')->label('Dibuat Pada')->dateTime(),
+                TextColumn::make('updated_at')->label('Diperbarui Pada')->dateTime(),
             ])
             ->filters([
                 //

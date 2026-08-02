@@ -131,7 +131,7 @@
             <path d="M3 7h3l2-3h8l2 3h3v12H3V7z"></path>
             <circle cx="12" cy="13" r="3.5"></circle>
         </svg>
-        Verify &amp; check in/out
+        Verifikasi &amp; absen masuk/keluar
     </button>
 
     <div
@@ -145,7 +145,7 @@
             @if(auth()->user()->face_descriptor)
                 Menyiapkan verifikasi wajah...
             @else
-                Data wajah belum ditemukan. Silakan enroll wajah Anda terlebih dahulu.
+                Data wajah belum ditemukan. Silakan daftarkan wajah Anda terlebih dahulu.
             @endif
         </span>
     </div>

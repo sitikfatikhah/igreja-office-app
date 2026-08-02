@@ -44,8 +44,8 @@ class EmployeeWorkScheduleService
                 }
 
                 if (
-                    $schedule->effective_untill &&
-                    Carbon::parse($schedule->effective_untill)->lt($date)
+                    $schedule->effective_until &&
+                    Carbon::parse($schedule->effective_until)->lt($date)
                 ) {
                     return false;
                 }

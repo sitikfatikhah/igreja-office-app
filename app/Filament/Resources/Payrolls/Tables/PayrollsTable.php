@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\Payrolls\Tables;
 
+use App\Exports\PayrollSlipExport;
 use App\Filament\Exports\PayrollExporter;
 use App\Models\Payrolls;
+use App\Services\SettingsService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -16,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Enums\PaginationMode;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PayrollsTable
 {
@@ -26,7 +29,7 @@ class PayrollsTable
             ->striped()
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Employee Name')
+                    ->label('Nama Pegawai')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('start_date')
@@ -36,23 +39,23 @@ class PayrollsTable
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('gross_pay')
-                    ->label('Gross')
+                    ->label('Penghasilan Kotor')
                     ->money('IDR', true)
                     ->sortable(),
                 TextColumn::make('net_pay')
-                    ->label('Net Pay')
+                    ->label('Penghasilan Bersih')
                     ->money('IDR', true)
                     ->sortable(),
                 TextColumn::make('deductions')
-                    ->label('Deductions')
+                    ->label('Potongan')
                     ->money('IDR', true)
                     ->sortable(),
                 TextColumn::make('additions')
-                    ->label('Additions')
+                    ->label('Tambahan')
                     ->money('IDR', true)
                     ->sortable(),
                 TextColumn::make('generated_at')
-                    ->label('Generated At')
+                    ->label('Tanggal Dibuat')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('status')
@@ -71,24 +74,35 @@ class PayrollsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make()
-                ,
-                Action::make('downloadSlip')
-                ->icon('heroicon-o-document-arrow-down')
-                ->action(function ($record) {
+                EditAction::make(),
 
-                    $pdf = Pdf::loadView(
-                        'filament.forms.slip',
-                        [
+                Action::make('downloadPdf')
+                    ->label('PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('danger')
+                    ->action(function ($record) {
+
+                        $pdf = Pdf::loadView('filament.forms.slip', [
                             'payroll' => $record,
-                        ]
-                    );
+                        ]);
 
-                    return response()->streamDownload(
-                        fn () => print($pdf->output()),
-                        'slip-gaji-' . $record->id . '.pdf'
-                    );
-                }),
+                        return response()->streamDownload(
+                            fn () => print($pdf->output()),
+                            'Slip-Gaji-' . $record->id . '.pdf'
+                        );
+                    }),
+
+                Action::make('downloadExcel')
+                    ->label('Excel')
+                    ->icon('heroicon-o-table-cells')
+                    ->color('success')
+                    ->action(function ($record) {
+
+                        return Excel::download(
+                            new PayrollSlipExport($record),
+                            'Slip-Gaji-' . $record->id . '.xlsx'
+                        );
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -98,7 +112,7 @@ class PayrollsTable
                 ]),
                 ExportAction::make()
                 ->exporter(PayrollExporter::class)
-                ->label('Export Payrolls'),
+                ->label('Ekspor Penggajian'),
                 
                 // Action::make('slip')
                 // ->label('Slip Gaji')
