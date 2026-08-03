@@ -171,4 +171,4 @@
 
 
     @vite('resources/js/face-attendance.js')
-@endpush
+@endpush    

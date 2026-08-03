@@ -275,7 +275,7 @@ window.initFaceAttendance = async function () {
         const verified = distance <= FACE_MATCH_THRESHOLD;
 
         return { verified, score: distance };
-    }
+    };
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371000; // meter
@@ -359,6 +359,20 @@ window.initFaceAttendance = async function () {
 
             setStatus('Mengambil lokasi GPS...', 'progress');
             const gps = await getGps();
+
+            console.log('===== GPS USER =====');
+            console.table({
+                latitude: gps.latitude,
+                longitude: gps.longitude,
+                location: gps.location_name,
+            });
+
+            console.log('===== OFFICE =====');
+            console.table({
+                latitude: window.appSettings.office_latitude,
+                longitude: window.appSettings.office_longitude,
+                radius: window.appSettings.radius,
+            });
             setStatus(`Lokasi diperoleh: ${gps.location_name}`, 'progress');
 
             const officelat = Number(window.appSettings.office_latitude);
