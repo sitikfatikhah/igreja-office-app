@@ -56,7 +56,7 @@ class AttendanceReportService
 
         while ($period->lte(Carbon::parse($endDate))) {
 
-            // Lewati hari libur sesuai jadwal kerja
+            // Lewati hari libur sesuai jadwal libur karyawan
             if (! $scheduleService->isWorkingDay($user, $period)) {
                 $period->addDay();
                 continue;

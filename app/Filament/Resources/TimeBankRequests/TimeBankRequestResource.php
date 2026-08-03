@@ -36,27 +36,22 @@ class TimeBankRequestResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Permohonan Time Bank');
+        return __('Permohonan Deposit Cuti');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Permohonan Time Bank');
+        return __('Permohonan Deposit Cuti');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Permohonan Time Bank');
-    }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Cuti');
+        return __('Permohonan Deposit Cuti');
     }
 
     public static function getBreadcrumb(): string
     {
-        return __('Permohonan Time Bank');
+        return __('Permohonan Deposit Cuti');
     }
 
     public static function getRelations(): array

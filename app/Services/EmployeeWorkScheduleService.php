@@ -17,7 +17,7 @@ class EmployeeWorkScheduleService
     }
 
     /**
-     * Load seluruh jadwal kerja user sekali saja.
+     * Load seluruh jadwal libur user sekali saja.
      */
     public function loadSchedules(User $user): void
     {
@@ -28,7 +28,7 @@ class EmployeeWorkScheduleService
     }
 
     /**
-     * Mengambil jadwal kerja yang berlaku pada tanggal tertentu.
+     * Mengambil jadwal libur yang berlaku pada tanggal tertentu.
      */
     public function getSchedule(User $user, Carbon $date): ?EmployeeWorkSchedule
     {
@@ -64,7 +64,7 @@ class EmployeeWorkScheduleService
         $schedule = $this->getSchedule($user, $date);
 
         if (! $schedule) {
-            // Jika belum ada jadwal kerja, anggap semua hari adalah hari kerja
+            // Jika belum ada jadwal libur, anggap semua hari adalah hari kerja
             return true;
         }
 

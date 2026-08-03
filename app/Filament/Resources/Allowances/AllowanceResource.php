@@ -48,11 +48,6 @@ class AllowanceResource extends Resource
         return __('Tunjangan');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Penggajian');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Tunjangan');

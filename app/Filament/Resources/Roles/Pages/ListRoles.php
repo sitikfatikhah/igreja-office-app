@@ -12,6 +12,16 @@ class ListRoles extends ListRecords
 {
     protected static string $resource = RoleResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Peran';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola peran dan hak akses pengguna.';
+    }
+
     protected function getActions(): array
     {
         return [

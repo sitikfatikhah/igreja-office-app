@@ -56,11 +56,6 @@ class AttendanceResource extends Resource
         return __('Kehadiran');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Kehadiran');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Kehadiran');

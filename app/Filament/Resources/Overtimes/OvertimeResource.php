@@ -50,11 +50,6 @@ class OvertimeResource extends Resource
         return __('Lembur');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Kehadiran');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Lembur');

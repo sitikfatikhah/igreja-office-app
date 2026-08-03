@@ -49,11 +49,6 @@ class LeaveDepositBalanceResource extends Resource
         return __('Saldo Deposit Cuti');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Cuti');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Saldo Deposit Cuti');

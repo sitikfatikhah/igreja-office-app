@@ -10,6 +10,16 @@ class ListLeaveRequests extends ListRecords
 {
     protected static string $resource = LeaveRequestResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Permohonan Cuti';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola seluruh permohonan cuti karyawan.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

@@ -17,6 +17,16 @@ class ListPayrolls extends ListRecords
 
     protected static ?string $cluster = PayrollsCluster::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Penggajian';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola daftar penggajian karyawan berdasarkan laporan kehadiran.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

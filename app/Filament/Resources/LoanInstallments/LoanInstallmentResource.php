@@ -36,6 +36,11 @@ class LoanInstallmentResource extends Resource
         return LoanInstallmentsTable::configure($table);
     }
 
+    public static function getNavigationLabel(): string
+    {
+        return __('Cicilan Pinjaman');
+    }
+
     public static function getRelations(): array
     {
         return [

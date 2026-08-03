@@ -50,11 +50,6 @@ class PayrollResource extends Resource
         return __('Penggajian');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Penggajian');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Penggajian');

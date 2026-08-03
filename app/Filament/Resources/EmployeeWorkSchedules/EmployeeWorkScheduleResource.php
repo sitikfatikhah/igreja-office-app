@@ -33,23 +33,23 @@ class EmployeeWorkScheduleResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('Jadwal Kerja');
+        return __('Jadwal Libur Karyawan');
     }
 
     public static function getModelLabel(): string
     {
-        return __('Jadwal Kerja');
+        return __('Jadwal Libur Karyawan');
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('Jadwal Kerja');
+        return __('Jadwal Libur Karyawan');
     }
 
 
     public static function getBreadcrumb(): string
     {
-        return __('Jadwal Kerja');
+        return __('Jadwal Libur Karyawan');
     }
 
     public static function getRelations(): array

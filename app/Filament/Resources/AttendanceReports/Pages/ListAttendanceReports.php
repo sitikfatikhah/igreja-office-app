@@ -15,6 +15,16 @@ class ListAttendanceReports extends ListRecords
 {
     protected static string $resource = AttendanceReportResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Laporan Kehadiran';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola laporan kehadiran per karyawan dan periode.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

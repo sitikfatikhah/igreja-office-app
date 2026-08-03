@@ -45,7 +45,7 @@
         ],
         [
             'id' => 'schedule',
-            'title' => 'Jadwal Kerja',
+            'title' => 'Jadwal Libur Karyawan',
             'description' => 'Atur Work Schedule dan rotasi shift untuk tim HR dan operasional.',
             'menu' => 'Work Schedule',
             'category' => 'operasional',
@@ -194,7 +194,7 @@
                         Pusat Bantuan HRIS
                     </span>
                     <h1 class="mt-3 text-3xl font-bold text-white sm:text-4xl">Panduan Penggunaan</h1>
-                    <p class="mt-2 max-w-2xl text-sm leading-6 text-white/85">Semua yang perlu Anda tahu tentang Attendance, Leave, Payroll, Pinjaman, Jadwal Kerja, Pengguna, dan Pengaturan &mdash; dalam satu tempat.</p>
+                    <p class="mt-2 max-w-2xl text-sm leading-6 text-white/85">Semua yang perlu Anda tahu tentang Attendance, Leave, Payroll, Pinjaman, Jadwal Libur Karyawan, Pengguna, dan Pengaturan &mdash; dalam satu tempat.</p>
                 </div>
                 <div class="grid gap-3 sm:grid-cols-2 lg:w-72" type="button">
                     <button id="#attendance" @click.prevent="goToTopic('attendance')" class="rounded-full inline-flex items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-primary-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-primary-50">

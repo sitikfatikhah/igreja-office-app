@@ -10,6 +10,16 @@ class ListLeaveDepositBalances extends ListRecords
 {
     protected static string $resource = LeaveDepositBalanceResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Saldo Simpanan Cuti';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola saldo simpanan cuti karyawan.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

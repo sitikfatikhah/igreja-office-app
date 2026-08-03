@@ -48,12 +48,7 @@ class LeaveRequestResource extends Resource
     {
         return __('Permohonan Cuti');
     }
-
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Cuti');
-    }
-
+    
     public static function getBreadcrumb(): string
     {
         return __('Permohonan Cuti');

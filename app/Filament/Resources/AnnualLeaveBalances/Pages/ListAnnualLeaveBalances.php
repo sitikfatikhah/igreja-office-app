@@ -10,6 +10,16 @@ class ListAnnualLeaveBalances extends ListRecords
 {
     protected static string $resource = AnnualLeaveBalanceResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Saldo Cuti Tahunan';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola saldo cuti tahunan karyawan.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

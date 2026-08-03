@@ -16,4 +16,14 @@ class ListOvertimes extends ListRecords
             CreateAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Lembur Karyawan';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola seluruh data lembur karyawan beserta status persetujuan.';
+    }
 }

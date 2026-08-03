@@ -15,6 +15,16 @@ class ListAttendances extends ListRecords
     protected static string $resource = AttendanceResource::class;
     protected static ?string $cluster = AttendancesCluster::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Kehadiran';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola data kehadiran karyawan secara teratur.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

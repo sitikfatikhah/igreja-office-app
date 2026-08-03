@@ -16,6 +16,16 @@ use Illuminate\Support\Facades\Auth;
 class Dashboard extends BaseDashboard
 {
     use HasFiltersAction;
+
+    public function getHeading(): string
+    {
+        return 'Dashboard';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Selamat datang di Dashboard Aplikasi HRIS GKI-Sutopo. Di sini Anda dapat mengelola data kehadiran, cuti, penggajian, pinjaman, jadwal libur karyawan, pengguna, dan pengaturan sistem secara efisien.';
+    }
     
     protected function getHeaderActions(): array
     {

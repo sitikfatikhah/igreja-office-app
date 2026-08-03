@@ -10,6 +10,16 @@ class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Pengguna';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola akun pengguna dan akses sistem.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [

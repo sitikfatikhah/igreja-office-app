@@ -29,6 +29,16 @@ class EnrollFace extends Page
     public ?string $descriptor = null;
     public ?string $referencePhoto = null;
 
+    public function getHeading(): string
+    {
+        return 'Pendaftaran Wajah';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola seluruh data pendaftaran wajah karyawan beserta status validasi.';
+    }
+
     public function saveFace(?string $descriptor = null, ?string $referencePhoto = null): void
     {
         $descriptor = $descriptor ?? $this->descriptor;

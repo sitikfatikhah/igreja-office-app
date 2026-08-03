@@ -56,11 +56,6 @@ class CompensationResource extends Resource
         return __('Kompensasi');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Penggajian');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Kompensasi');

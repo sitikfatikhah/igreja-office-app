@@ -49,11 +49,6 @@ class AnnualLeaveBalanceResource extends Resource
         return __('Saldo Cuti Tahunan');
     }
 
-    public static function getNavigationGroup(): ?string
-    {
-        return __('Cuti');
-    }
-
     public static function getBreadcrumb(): string
     {
         return __('Saldo Cuti Tahunan');

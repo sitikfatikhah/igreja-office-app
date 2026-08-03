@@ -10,6 +10,16 @@ class ListCompensation extends ListRecords
 {
     protected static string $resource = CompensationResource::class;
 
+    public function getHeading(): string
+    {
+        return 'Daftar Kompensasi';
+    }
+
+    public function getSubheading(): ?string
+    {
+        return 'Kelola data kompensasi dan penggantian karyawan.';
+    }
+
     protected function getHeaderActions(): array
     {
         return [
