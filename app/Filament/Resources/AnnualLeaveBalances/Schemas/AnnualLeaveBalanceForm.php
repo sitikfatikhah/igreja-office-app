@@ -4,6 +4,8 @@ namespace App\Filament\Resources\AnnualLeaveBalances\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class AnnualLeaveBalanceForm
@@ -38,13 +40,17 @@ class AnnualLeaveBalanceForm
                     ->options([
                         'credit' => 'Credit',
                         'debit' => 'Debit',
-                        'balanced' => 'Balanced',
+                        'balance' => 'Balance',
                     ])
-                    ->default('balanced')    
-                    ->disabled(fn () => auth()->user()->hasRole('user'))
-                    ->dehydrated()
+                    ->default('balance')
+                    ->live()
+                    ->afterStateUpdated(function ($state, Get $get, Set $set) {
+                        if ($state === 'balance') {
+                            $set('balanced', $get('days'));
+                        }
+                    })
                     ->required()
-                    ->helperText('Type of leave balance.'),
+                    ->helperText("Saldo type. 'Credit' adds days, 'Debit' subtracts days, and 'Balance' sets the remaining balance."),
                 Select::make('leave_type')
                     ->label('Leave Type')
                     ->options([
@@ -63,9 +69,19 @@ class AnnualLeaveBalanceForm
                 TextInput::make('days')
                     ->label('Days')
                     ->numeric()
-                    ->dehydrated()
                     ->required()
-                    ->helperText('Number of leave days.'),
+                    ->live()
+                    ->afterStateUpdated(function ($state, Set $set, Get $get) {
+                        if ($get('type') === 'balance') {
+                            $set('balanced', $state);
+                        }
+                    }),
+                TextInput::make('balanced')
+                    ->label('Remaining Balance')
+                    ->numeric()
+                    ->required()
+                    ->default(0)
+                    ->dehydrated(),
             ]);
     }
 }

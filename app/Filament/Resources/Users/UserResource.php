@@ -81,7 +81,7 @@ class UserResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->with(['compensation', 'allowance']);
+            ->with(['compensation', 'allowances', 'annualLeaveBalance', 'employeeLoan', 'attendance', 'payroll']);
     }
 
     public static function getPages(): array

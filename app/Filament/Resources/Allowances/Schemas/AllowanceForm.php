@@ -12,11 +12,10 @@ class AllowanceForm
     {
         return $schema
             ->components([
-                Select::make('type')
+                TextInput::make('type')
                     ->label('Nama')
                     ->required()
                     ->helperText('Masukkan nama tunjangan.'),
-
                 TextInput::make('amount')
                     ->required()
                     ->numeric()

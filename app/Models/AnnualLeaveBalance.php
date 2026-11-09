@@ -12,7 +12,7 @@ class AnnualLeaveBalance extends Model
         'year',
         'leave_type',
         'days',
-        'type',                // credit | debit
+        'type', // credit | debit
         'balanced',
         'source', //annual or time-bank
         'description',

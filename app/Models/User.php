@@ -53,13 +53,14 @@ class User extends Authenticatable implements FilamentUser, HasAvatar
     {
         return $this->hasMany(EmployeeWorkSchedule::class);
     }
-    public function compensation()
+    public function compensation() : BelongsTo
     {
-        return $this->belongsTo(Compensations::class, 'compensation_id');
+        return $this->belongsTo(Compensations::class);
     }
-    public function allowance() : BelongsToMany
+    public function allowances(): BelongsToMany
     {
-        return $this->belongsToMany(Allowance::class);
+        return $this->belongsToMany(Allowance::class)
+            ->withTimestamps();
     }
     public function annualLeaveBalance()
     {

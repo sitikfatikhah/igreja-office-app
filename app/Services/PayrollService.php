@@ -96,7 +96,7 @@ class PayrollService
             |--------------------------------------------------------------------------
             */
 
-            $allowances = $user->allowance;
+            $allowances = $user->allowances()->get();
 
             foreach ($allowances as $allowance) {
 

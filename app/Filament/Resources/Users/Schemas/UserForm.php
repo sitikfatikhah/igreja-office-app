@@ -60,6 +60,7 @@ class UserForm
                 Select::make('compensation_id')
                     ->relationship('compensation', 'basic_salary')
                     ->label('Kompensasi')
+                    ->required()
                     ->preload()
                     ->searchable()
                     ->helperText('Kompensasi pegawai.'),
@@ -69,14 +70,18 @@ class UserForm
                     ->required()
                     ->revealable()
                     ->helperText('Buat kata sandi yang aman.'),
-                CheckboxList::make('allowance')
-                    ->relationship('allowance', 'type')
+                CheckboxList::make('allowances')
+                    ->relationship('allowances', 'type')
+                    ->required()
                     ->label('Tunjangan')
                     ->searchable()
+                    ->separator(',')
+                    ->columns(2)
                     ->helperText('Pilih satu atau lebih tunjangan.'),
 
                 CheckboxList::make('roles')
                     ->relationship('roles', 'name')
+                    ->required()
                     ->searchable()
                     ->helperText('Pilih satu atau lebih peran.'),
 

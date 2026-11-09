@@ -69,7 +69,7 @@ class PayrollForm
 
                                         $basicSalary = optional($user->compensation)->basic_salary ?? 0;
 
-                                        $allowanceTotal = $user->allowance->sum('amount');
+                                        $allowanceTotal = $user->allowances()->sum('amount');
 
                                         $overtimeTotal = 0;
 

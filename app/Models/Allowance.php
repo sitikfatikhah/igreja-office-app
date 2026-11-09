@@ -16,6 +16,6 @@ class Allowance extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'allowance_id');
+        return $this->belongsToMany(User::class)->withTimestamps();
     }
 }
