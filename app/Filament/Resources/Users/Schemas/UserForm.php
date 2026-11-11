@@ -70,6 +70,7 @@ class UserForm
                     ->required()
                     ->revealable()
                     ->helperText('Buat kata sandi yang aman.'),
+                    
                 CheckboxList::make('allowances')
                     ->relationship('allowances', 'type')
                     ->required()

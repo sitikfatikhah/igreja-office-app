@@ -31,11 +31,24 @@ class UsersTable
                 TextColumn::make('position')
                     ->label('Jabatan')
                     ->sortable(),
-                TextColumn::make('allowance.type')
-                    ->label('Jenis Tunjangan'),
-                TextColumn::make('allowance.amount')
+                    
+                    //belum telihat
+                TextColumn::make('allowances.type')
+                    ->label('Jenis Tunjangan')
+                     ->formatStateUsing(
+                        fn ($state, $record) => $record->allowances
+                            ->pluck('type')
+                            ->implode(', ')
+                    ),
+                TextColumn::make('allowances.amount')
                     ->label('Nominal Tunjangan')
-                    ->money('IDR'),
+                    ->formatStateUsing(
+                        fn ($state, $record) => $record->allowances
+                            ->map(fn ($allowance) => $allowance->amount)
+                            ->map(fn ($amount) => 'Rp ' . number_format($amount, 0, ',', '.'))
+                            ->implode(', ')
+                    ),
+
                 TextColumn::make('compensation.basic_salary')
                     ->label('Gaji Pokok')
                     ->money('IDR'),

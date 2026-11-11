@@ -11,20 +11,32 @@ class UserController extends Controller
 {
     public function index()
     {
-        // Logic to retrieve and return users
+        $users = User::with('allowances')->get();
+
+        return response()->json([
+            'data' => $users,
+        ]);
     }
     public function create()
     {
-        // Logic to show form for creating a new user
+        $allowances = DB::table('allowances')->get();
+        $compensations = DB::table('compensations')->get();
+        return response()->json([
+            'allowances' => $allowances,
+            'compensations' => $compensations
+        ]);
     }
     public function store(Request $request)
     {
-        // Logic to validate and store a new user
+        
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'description' => 'nullable|string',
+            'nip' => 'nullable|string',
+            'position' => 'nullable|string',
             'department' => 'nullable|string',
+            'allowance_id' => 'nullable|string',
+            'compensation_id' => 'nullable|string',
             'password' => 'required|string|min:8|confirmed',
         ]);
     }
