@@ -46,7 +46,7 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->registration()
             ->passwordReset()
-            ->emailVerification()
+            // ->emailVerification()
             ->emailChangeVerification()
             ->profile()
             ->userMenu(position: UserMenuPosition::Sidebar)
